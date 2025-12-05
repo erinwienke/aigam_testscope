@@ -41,91 +41,91 @@
         </tr>
         <tr>
             <td>MW-1</td>
-            <td>Verify valid routing request from frontend to backend (maps + AI) through middleware<td>
+            <td>Verify valid routing request from frontend to backend (maps + AI) through middleware</td>
             <td>A valid route request with correct parameters reaches M1, is validated/normalized by M2, routed via M1 to the correct backend(s) by M4, and a combined JSON response is returned to the UI</td>
             <td>FR-1.3, FR-2.1</td>
         </tr>
         <tr>
             <td>MW-2</td>
-            <td>Verify handling of invalid route input payload<td>
+            <td>Verify handling of invalid route input payload</td>
             <td>When a malformed or incomplete routing payload is sent, M2 rejects it with a clear error response (e.g., 400 + validation errors), and no backend call is made by M4</td>
             <td>FR-1.3, FR-2.4</td>
         </tr>
         <tr>
             <td>MW-3</td>
-            <td>Verify async AI optimization task via Queue Manager<td>
+            <td>Verify async AI optimization task via Queue Manager</td>
             <td>For a valid itinerary optimization request, M1 routes to M4, which enqueues an AI optimization task in M5. Immediate acknowledgement is returned to the UI while M5 processes the task asynchronously</td>
             <td>FR-1.4, FR-2.1, NFR-2, NFR-3</td>
         </tr>
         <tr>
             <td>MW-4</td>
-            <td>Verify itinerary cache hit for repeated itinerary request<td>
+            <td>Verify itinerary cache hit for repeated itinerary request</td>
             <td>Second and subsequent identical itinerary requests are served by M3 from cache without calling backend AI or map APIs, returning the same correct itinerary JSON faster</td>
             <td>FR-1.6, FR-2.1, FR-2.5, NFR-2, NFR-3</td>
         </tr>
         <tr>
             <td>MW-5</td>
-            <td>Verify cache miss and population for new itinerary data<td>
+            <td>Verify cache miss and population for new itinerary data</td>
             <td>On the first itinerary request, M3 reports a cache miss, M4 fetches data from Google/AI services, response is cached by M3 and returned; subsequent calls hit the cache.</td>
             <td>FR-1.6, FR-2.1, FR-2.2, NFR-2</td>
         </tr>
         <tr>
             <td>MW-6</td>
-            <td>Verify forecast data retrieval and validation<td>
+            <td>Verify forecast data retrieval and validation</td>
             <td>A request including date/time and location triggers M3 to get forecast data from external APIs and M2 to validate time-based weather data format and ranges before returning JSON</td>
             <td>FR-2.2</td>
         </tr>
         <tr>
             <td>MW-7</td>
-            <td>Verify AI preferences mapping in API Integrator<td>
+            <td>Verify AI preferences mapping in API Integrator</td>
             <td>When user preferences (budget, activity type, pace, etc.) are sent, M4 correctly maps them into the AI itinerary generator input schema and receives an itinerary aligned with those preferences</td>
             <td>FR-2.3</td>
         </tr>
         <tr>
             <td>MW-8</td>
-            <td>Verify validation and verification of AI results<td>
+            <td>Verify validation and verification of AI results</td>
             <td>The AI itinerary generator returns a response with intentional schema quirks/edge values; M2 validates structure and constraints, while M4 triggers backend verification logic (e.g., sanity checks, route feasibility). Invalid results are rejected or corrected before reaching UI</td>
             <td>FR-2.4</td>
         </tr>
         <tr>
             <td>MW-9</td>
-            <td>Verify saved itinerary retrieval and routing<td>
+            <td>Verify saved itinerary retrieval and routing</td>
             <td>A request to load a saved itinerary is routed by M1, M3 retrieves the saved itinerary from cache/storage, and M1 determines the correct route/endpoint for that request, returning the full itinerary JSON</td>
             <td>FR-2.1, FR-2.5</td>
         </tr>
         <tr>
             <td>MW-10</td>
-            <td>Performance test for common queries (caching + async)<td>
+            <td>Performance test for common queries (caching + async)</td>
             <td>Under repeated identical or similar itinerary/map requests, overall latency decreases due to M3 caching and M5 offloading heavy AI tasks; system meets defined response-time target for common queries</td>
             <td>NFR-2, NFR-3</td>
         </tr>
         <tr>
             <td>MW-11</td>
-            <td>Verify text-first response behavior with reduced payload<td>
+            <td>Verify text-first response behavior with reduced payload</td>
             <td>For large, complex itineraries, M5 sends an initial lightweight “text-first” or partial response, while M3 ensures reduced payload is valid and consistent; later updates or full data are delivered asynchronously</td>
             <td>NFR-2, NFR-4</td>
         </tr>
         <tr>
             <td>MW-12</td>
-            <td>Verify timeout and retry policies for backend calls<td>
+            <td>Verify timeout and retry policies for backend calls</td>
             <td>When a backend AI or Google Maps API call exceeds timeout, M1 enforces a timeout, optionally retries according to policy, and returns a controlled error or fallback response instead of hanging</td>
             <td>NFR-5</td>
         </tr>
         <tr>
             <td>MW-13</td>
-            <td>Verify load balancing and cache fallback on service failure<td>
+            <td>Verify load balancing and cache fallback on service failure</td>
             <td>With multiple backend instances, M1 distributes requests across them; if one service instance fails, requests are routed to healthy instances, and if all instances fail, M3 provides cached responses where available and a graceful degraded response otherwise</td>
             <td>NFR-3, NFR-6</td>
         </tr>
         <tr>
             <td>MW-14</td>
-            <td>Verify HTTPS/TLS enforcement at API Gateway<td>
+            <td>Verify HTTPS/TLS enforcement at API Gateway</td>
             <td>Any HTTP request is either rejected or redirected; all accepted requests must use HTTPS/TLS. Insecure connections are not allowed to reach internal services.</td>
             <td>NFR-8</td>
         </tr>
         <tr>
             <td>MW-15</td>
-            <td>Verify queue recovery and task replay on failure<td>
+            <td>Verify queue recovery and task replay on failure</td>
             <td>When a queued AI tasks in M5 fails mid-processing (e.g., backend crash), M5 retries or re-queues the task according to policy; tasks are not silently lost, and successful completion eventually returns results to the middleware.</td>
             <td>FR-1.4, NFR-3, NFR-6</td>
         </tr>
@@ -133,6 +133,7 @@
 </div>
 </body>
 </html>
+
 
 
 
