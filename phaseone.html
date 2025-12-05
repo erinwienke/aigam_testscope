@@ -19,134 +19,197 @@
 
 
 <div class="container">
-    <h1>AIGAM Test</h1>
+    <h1>AIGAM Testing</h1>
     <h2>Phase 1: Backend Integration + External Systems</h2>
 
-    <h2>Functional Requirements</h2>
+    <p>This phase will test the integration of the backend module with its external dependencies:</p>
+    <ul>
+        <li>User Service (B1)</li>
+        <li>Recommendation Service (B2)</li>
+        <li>Itinerary Service (B3)</li>
+        <li>Mapping Service (B4)</li>
+        <li>Weather Service (B6)</li>
+        <li>Notification Service (B6)</li>
+        <li>The message bus</li>
+        <li>The message queue</li>
+        <li>Connection to external AI model</li>
+        <li>Connection to external mapping provider</li>
+        <li>Connection to external weather provider</li>
+        <li>Connection to external push notification service</li>
+    </ul>
 
-    <section aria-labelledby="det-track">
-        <h3 id="det-track">Detection &amp; Tracking</h3>
-        <ul>
-            <li><code>FR-01</code>: The system shall maintain a continuously updated in-path lead target with &ge;95% persistence for objects within &plusmn;0.6 lane widths and 2&ndash;120&nbsp;m range.</li>
-            <li><code>FR-02</code>: The system shall update target range and range-rate at &ge;20&nbsp;Hz and latency &le;100&nbsp;ms from sensor timestamp to controller use.</li>
-        </ul>
-    </section>
+    <p>Based on the traceability matrix, the backend integration and external system testing will focus on:</p>
+    <ul>
+        <li>The Recommendation Service can assemble full context from the Use and Weather services and call the AI model.</li>
+        <li>The Itinerary Service determines the most efficient sequence of locations to visit, takes recommendations, performs sanity checks, and publishes ItineraryUpdated events.</li>
+        <li>The Mapping and Weather Service correctly proxy responses from their external providers and relies on backup providers if the default is down</li>
+    </ul>
 
-    <section aria-labelledby="gap-distance">
-        <h3 id="gap-distance">Gap/Distance Control</h3>
-        <ul>
-            <li><code>FR-03</code>: The driver shall be able to select a time headway setting &isin; {short, medium, long} mapping to {~0.8&nbsp;s, 1.2&nbsp;s, 1.8&nbsp;s} (tunable).</li>
-            <li><code>FR-04</code>: In <strong>ACTIVE-FOLLOW</strong>, the system shall regulate ego speed to maintain the selected time headway (&plusmn;0.2&nbsp;s) to the lead vehicle for relative speeds within &minus;30 to +10&nbsp;m/s.</li>
-            <li><code>FR-05</code>: If the lead decelerates, the system shall command deceleration up to a comfort limit of &minus;2.5&nbsp;m/s&sup2; and up to &minus;4.0&nbsp;m/s&sup2; in safety-critical cases, before disengaging to AEB if available.</li>
-        </ul>
-    </section>
+    <h2>Test Skeleton</h2>
 
-    <section aria-labelledby="speed-control">
-        <h3 id="speed-control">Speed Control (no lead)</h3>
-        <ul>
-            <li><code>FR-06</code>: In <strong>ACTIVE-CRUISE</strong>, the system shall track the set speed within &plusmn;2&nbsp;km/h on grades up to &plusmn;5% without lead vehicle constraints.</li>
-        </ul>
-    </section>
-
-    <section aria-labelledby="cut-handling">
-        <h3 id="cut-handling">Cut-in / Cut-out Handling</h3>
-        <ul>
-            <li><code>FR-07</code>: Upon a cut-in object with confidence &ge;C and predicted path overlap within 1.0&nbsp;s, the system shall re-target within 200&nbsp;ms and adapt acceleration to satisfy FR-04.</li>
-            <li><code>FR-08</code>: On lead cut-out (loss of in-path criteria &ge;300&nbsp;ms), the system shall revert to <strong>ACTIVE-CRUISE</strong> and smoothly return to set speed respecting accel limits.</li>
-        </ul>
-    </section>
-
-    <section aria-labelledby="stop-go">
-        <h3 id="stop-go">Stop-and-Go</h3>
-        <ul>
-            <li><code>FR-09</code>: The system shall decelerate to a stop behind a stopping lead and hold brake pressure. If the standstill exceeds N seconds (e.g., 3&nbsp;s), the system shall require driver RESUME or accelerator tap to move.</li>
-            <li><code>FR-10</code>: If the lead moves within N seconds and no override is detected, the system shall automatically resume and re-establish time headway.</li>
-        </ul>
-    </section>
-
-    <section aria-labelledby="driver-interface">
-        <h3 id="driver-interface">Driver Interface &amp; Overrides</h3>
-        <ul>
-            <li><code>FR-11</code>: Brake pedal application shall immediately suspend longitudinal commands and place the system in <strong>SUSPENDED</strong>.</li>
-            <li><code>FR-12</code>: Accelerator pedal &gt; threshold shall bias commands to allow temporary speed increase but maintain distance control where feasible; on release, return to controlled speed/gap.</li>
-            <li><code>FR-13</code>: HMI shall display: set speed, active mode, selected gap, lead presence, and textual alerts for degraded/blocked sensors.</li>
-        </ul>
-    </section>
-
-    <section aria-labelledby="fallback">
-        <h3 id="fallback">Fallback &amp; Fault Handling</h3>
-        <ul>
-            <li><code>FR-14</code>: On sensor blockage or degraded confidence for &gt;1&nbsp;s, the system shall inhibit new activations and gracefully disengage within 500&nbsp;ms if active, presenting &ldquo;Sensor blocked.&rdquo;</li>
-            <li><code>FR-15</code>: On critical actuator or network fault, the system shall command zero additional torque/brake and disengage with an audible/visual alert.</li>
-        </ul>
-    </section>
-
-    <section aria-labelledby="cal-limits">
-        <h3 id="cal-limits">Calibration &amp; Limits</h3>
-        <ul>
-            <li><code>FR-16</code>: Commanded accel/decel shall respect vehicle-level constraints (tire friction, ESC states) and jerk limits (e.g., |jerk| &le; 3&nbsp;m/s&sup3; comfort).</li>
-            <li><code>FR-17</code>: Minimum controllable speed: 0&nbsp;km/h; maximum set speed limited to legal/market config.</li>
-        </ul>
-    </section>
-
-    <hr />
-
-    <header>
-        <h2>Non-Functional Requirements (NFR)</h2>
-    </header>
-
-    <section aria-labelledby="safety">
-        <h3 id="safety">Safety &amp; Compliance</h3>
-        <ul>
-            <li><code>NFR-S1</code>: Designed to an automotive functional safety process (e.g., ISO&nbsp;26262), with hazards analyzed (see &sect;10) and safety goals allocated with ASIL assumptions.</li>
-            <li><code>NFR-S2</code>: Fail-silent behavior: no unintended propulsion/braking on faults.</li>
-        </ul>
-    </section>
-
-    <section aria-labelledby="performance">
-        <h3 id="performance">Performance &amp; Timing</h3>
-        <ul>
-            <li><code>NFR-P1</code>: End-to-end control loop (sensor timestamp &rarr; actuation request on bus) &le;100&nbsp;ms (95th percentile).</li>
-            <li><code>NFR-P2</code>: Controller cycle time &le;10&nbsp;ms; worst-case execution time (WCET) bounded and verified.</li>
-            <li><code>NFR-P3</code>: Range tracking RMS error &le;0.75&nbsp;m at 30&ndash;60&nbsp;m for steady follow.</li>
-        </ul>
-    </section>
-
-    <section aria-labelledby="reliability">
-        <h3 id="reliability">Reliability &amp; Availability</h3>
-        <ul>
-            <li><code>NFR-R1</code>: Mean time between hazardous disengagements (MTBHD) &ge; 5,000&nbsp;h.</li>
-            <li><code>NFR-R2</code>: Graceful degradation when any single sensor is lost (if sensor suite supports redundancy).</li>
-        </ul>
-    </section>
-
-    <section aria-labelledby="usability">
-        <h3 id="usability">Usability</h3>
-        <ul>
-            <li><code>NFR-U1</code>: All key states must be visible to the driver within 1 glance (&le;2&nbsp;s) on cluster.</li>
-            <li><code>NFR-U2</code>: Button actions (SET, RESUME, CANCEL) acknowledged on cluster within 150&nbsp;ms.</li>
-        </ul>
-    </section>
-
-    <section aria-labelledby="security">
-        <h3 id="security">Security</h3>
-        <ul>
-            <li><code>NFR-C1</code>: Accept commands only from authenticated ECUs; ignore malformed frames.</li>
-            <li><code>NFR-C2</code>: Diagnostic changes to parameters require secure session.</li>
-        </ul>
-    </section>
-
-    <section aria-labelledby="maintainability">
-        <h3 id="maintainability">Maintainability &amp; Diagnostics</h3>
-        <ul>
-            <li><code>NFR-M1</code>: Log key events (engage/disengage, target switches, faults) with timestamps for 20&nbsp;min rolling buffer.</li>
-            <li><code>NFR-M2</code>: Provide DTCs with freeze-frame data for sensor visibility and actuator availability.</li>
-        </ul>
-    </section>
+     <tr>
+        <th>Test Case ID</th>
+         <th>Test Objective</th>
+        <th>Test Description</th>
+        <th>Expected Results</th>
+        <th>Functional/Non-functional Requirement Satisfied</th>
+      </tr>
+      <tr>
+        <td>BE-1</td>
+        <td>Verify User Service CRUD and secure persistence<td>
+        <td>Using the test harness, call User Service (B1) to create a new user profile with preferences and an empty itinerary, retrieve it, update a field (e.g., budget), then delete it</td>
+        <td>
+            <ol>
+                <li>Create/Read/Update/Delete operations succeed via API </li>
+                <li>Retrieved data matches submitted fields</li>
+                <li>Service emits structured logs for each operation</li>
+                <li>Data is stored in the primary database with encryption-at-rest enabled (checked via DB config/metadata, not raw values)</li>
+            </ol>
+        </td>
+        <td>FR-2.3, FR-2.5, NFR-7, NFR-9, NFR-10</td>
+      </tr>
+    <tr>
+        <td>BE-2</td>
+        <td>Ensure Recommendation Service assembles full context and calls AI<td>
+        <td>Enqueue an itinerary-generation job for Recommendation Service (B2) with a minimal payload (location + time). B2 should fetch user preferences from B1 and weather from B5, then call the external AI model</td>
+        <td>
+            <ol>
+                <li>B2 issues requests to B1 and B5 to build full context  </li>
+                <li>External AI model is invoked with combined context </li>
+                <li>AI response is returned to B2 in normalized format </li>
+                <li>Errors are logged if any dependency fails</li>
+            </ol>
+        </td>
+        <td>FR-2.1, FR-2.2, FR-2.3, NFR-2, NFR-3, NFR-10</td>
+      </tr>
+    <tr>
+        <td>BE-3</td>
+        <td>Validate AI model fallback path<td>
+        <td>Configure primary AI endpoint to return an error or timeout. Trigger a recommendation job as in BE-2</td>
+        <td>
+            <ol>
+                <li>B2 detects failure from primary AI provider</li>
+                <li>B2 automatically calls backup AI model </li>
+                <li>A valid recommendation list is still produced</li>
+                <li>Logs clearly indicate primary failure and fallback usage</li>
+            </ol>
+        </td>
+        <td>FR-2.1, NFR-2, NFR-3, NFR-6, NFR-10</td>
+      </tr>
+    <tr>
+        <td>BE-4</td>
+        <td>Verify Itinerary Service transforms recommendations into a logical plan</td>
+        <td>Feed Itinerary Service (B3) a mock ranked list of recommendations from B2 via its API. Include activities that are impossible or out-of-hours to trigger sanity checks</td>
+        <td>
+            <ol>
+                <li>B3 performs sanity checks (e.g., filters closed venues / impossible times)</li>
+                <li>B3 orders activities to minimize travel time and produce a sequential itinerary</li>
+                <li>B3 saves final itinerary via B1</li>
+                <li>B3 publishes an ItineraryUpdated event to the message bus</li>
+            </ol>
+        </td>
+        <td>FR-1.4, FR-2.4, FR-2.5, NFR-2, NFR-3, NFR-6, NFR-10</td>
+      </tr>
+    <tr>
+        <td>BE-5</td>
+        <td>Validate Mapping Service navigation + multi-stop routing</td>
+        <td>Call Mapping Service (B4) directly with origin, destination, and intermediate waypoints for multiple transport modes (driving/walking/transit)</td>
+        <td>
+            <ol>
+                <li>For each mode, B4 returns routes and turn-by-turn directions from external mapping provider</li>
+                <li>Routes include all intermediate stops</li>
+                <li>Response format is normalized for frontend use (e.g., consistent JSON fields)</li>
+            </ol>
+        </td>
+        <td>FR-1.4, FR-2.4, FR-2.5, NFR-2, NFR-3, NFR-6, NFR-10</td>
+      </tr>
+    <tr>
+        <td>BE-6</td>
+        <td>Validate Mapping Service fallback provider</td>
+        <td>Simulate primary mapping provider being unavailable (error/timeout) and re-run BE-5</td>
+        <td>
+            <ol>
+                <li>B4 detects primary provider failure</li>
+                <li>B4 routes request to backup provider</li>
+                <li>Valid route and directions are still returned </li>
+                <li>Logs capture primary provider failure and fallback activation</li>
+            </ol>
+        </td>
+        <td>FR-1.1, FR-1.3, FR-1.4, FR-1.5, NFR-2, NFR-10</td>
+      </tr>
+    <tr>
+        <td>BE-7</td>
+        <td>Verify Weather Service forecast retrieval and caching </td>
+        <td>Call Weather Service (B5) for forecast data for a location twice in succession, then again after a cache-expiry window</td>
+        <td>
+            <ol>
+                <li>First call fetches data from external weather provider</li>
+                <li>Second call returns cached result (no external call or clearly flagged as cache hit)</li>
+                <li>After expiry, Weather Service refreshes from provider</li>
+                <li>Service exposes current/forecast conditions in normalized format</li>
+            </ol>
+        </td>
+        <td>FR-2.2, NRF-2, NFR-3, NFR-6, NFR-10</td>
+      </tr>
+    <tr>
+        <td>BE-8</td>
+        <td>Validate async job handling via message queue</td>
+        <td>Push several itinerary-generation jobs onto the message queue for B2. Intentionally make one job fail once (e.g., temporary AI error) to test retry behavior</td>
+        <td>
+            <ol>
+                <li>Each job is dequeued and processed by B2</li>
+                <li>Failed job is retried according to queue policy</li>
+                <li>Successfully processed jobs result in recommendations being produced and handed off to B3</li>
+                <li>Queue metrics and logs reflect job status (success/retry/failure)</li>
+            </ol>
+        </td>
+        <td>FR-2.1, FR-2.2, FR-2.3, NFR-2, NFR-3, NFR-6, NFR-10</td>
+      </tr>
+    <tr>
+        <td>BE-9</td>
+        <td>Verify Notification Service reacts to itinerary updates</td>
+        <td>After running BE-4, ensure ItineraryUpdated events appear on the message bus. Start Notification Service (B6) subscribed to the relevant topic and simulate a reachable push provider</td>
+        <td>
+            <ol>
+                <li>B6 receives ItineraryUpdated event from bus</li>
+                <li>B6 requests user’s push token from B1</li>
+                <li>B6 sends a notification payload to the external push notification service</li>
+                <li>Logs show event receipt, token fetch, and push call</li>
+            </ol>
+        </td>
+        <td>FR-2.5, NFR-6, NFR-10</td>
+      </tr>
+    <tr>
+        <td>BE-10</td>
+        <td>Validate backend logging and traceability across a fully itinerary flow</td>
+        <td>Trigger a “happy path” backend-only flow: create user (B1) → enqueue recommendation job (queue → B2) → generate itinerary (B3/B4/B5) → save + publish event → send notification (B6)</td>
+        <td>
+            <ol>
+                <li>All involved services emit structured logs for their operations </li>
+                <li>A common correlation ID or equivalent can be used to trace the full flow across logs</li>
+                <li>The complete flow runs without backend errors</li>
+            </ol>
+        </td>
+        <td>FR-2.1, FR-2.2, FR-2.3, FR-2.4, FR-2.5, NFR-6, NFR-10</td>
+      </tr>
+    <tr>
+        <td>BE-11</td>
+        <td>Backend performance smoke test for itinerary generation </td>
+        <td>Using the harness, run several parallel itinerary-generation jobs (through queue + B2 + B3) under a light-to-moderate load and measure time from job enqueue to itinerary persistence</td>
+        <td>
+            <ol>
+                <li>Median processing time per itinerary is within the 10-second target for backend-only scope</li>
+                <li>Recommendation and Itinerary Services scale horizontally (no single node saturation) based on deployment configuration</li>
+            </ol>
+        </td>
+        <td>NFR-2, NFR-3, NFR-6</td>
+      </tr>
+    
 </div>
 </body>
 
 </html>
+
 
 
 
