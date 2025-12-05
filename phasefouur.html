@@ -18,74 +18,207 @@
 </nav>
 <div class="container">
     <h1>AIGAM Test</h1>
-      <h2>Phase 4: Validation + Full System</h2>
+    <h2>Phase 4: Validation + Full System</h2>
+    
+    <p>In this phase of testing, we are validating that the developed software meets the functional and non-functional requirements. These tests look at all modules of the software at one time to ensure end-to-end adherence to the requirements.</p>
 
-    <h3>Introduction</h3>
-    <p>The design rationale for the ACC system explains the reasoning behind the architectural and modular decisions that support dynamic speed adjustment, distance monitoring, and driver safety. The team’s overarching objective was to design a modular and fault-tolerant system that integrates multiple subsystems including cruise control, detection, fault handling, and driver interface, into a cohesive software architecture. The rationale focuses on how design decisions fulfill both functional (FR) and non-functional requirements (NFR) including safety, reliability, modularity, and usability. The team’s proposed design is consistent with the principles from the process control systems read about in class as it emphasizes the separation of process concerns, such as vehicle motion, from control concerns, such as decision making based on sensor feedback.</p>
+    <table>
+      <tr>
+        <th>Test Case ID</th>
+        <th>Test Description</th>
+        <th>Expected Results</th>
+        <th>Functional/Nonfunctional Requirement Satisfied</th>
+      </tr>
+      <tr>
+        <td>V-1a</td>
+        <td>User opens interactive map without location permissions granted</td>
+        <td>Interactive map is displayed, centered around Washington, DC</td>
+        <td>FR-1.1, FR-1.2</td>
+      </tr>
+      <tr>
+        <td>V-1b</td>
+        <td>User opens interactive app with location permissions granted</td>
+        <td>Interactive map is displayed, centered around user’s current location</td>
+        <td>FR-1.1, FR-1.2</td>
+      </tr>
+      <tr>
+        <td>V-2</td>
+        <td>User grants location permissions to app</td>
+        <td>App updates map and centers it with user’s current location</td>
+        <td>FR-1.2</td>
+      </tr>
+        <tr>
+        <td>V-3</td>
+        <td>User selects a destination</td>
+        <td>App provides directions from point A to point B, displayed on map and in text</td>
+        <td>FR-1.3</td>
+      </tr>
+        <tr>
+        <td>V-4a</td>
+        <td>User adds a stop between origin and destination</td>
+        <td>App updates route to include stop</td>
+        <td>FR-1.4</td>
+      </tr>
+        <tr>
+        <td>V-4b</td>
+        <td>User selects “Optimize Route” option</td>
+        <td>App recalculates route to minimize travel time</td>
+        <td>FR-1.4</td>
+      </tr>
+        <tr>
+        <td>V-5a</td>
+        <td>User selects to ride bus as a mode of transport</td>
+        <td>Directions update to bus routes</td>
+        <td>FR-1.5</td>
+      </tr>
+        <tr>
+        <td>V-5b</td>
+        <td>User selects walking as mode of transport</td>
+        <td>Directions update to walking paths</td>
+        <td>FR-1.5</td>
+      </tr>
+        <tr>
+        <td>V-5c</td>
+        <td>User selections driving as mode of transport</td>
+        <td>Directions update to driving routes</td>
+        <td>FR-1.5</td>
+      </tr>
+        <tr>
+        <td>V-6a</td>
+        <td>Users prompts app to show restaurants</td>
+        <td>App populates with a list of restaurants along route</td>
+        <td>FR-1.6</td>
+      </tr>
+        <tr>
+        <td>V-6b</td>
+        <td>User prompts app to show activities</td>
+        <td>App populates with list of activities along route</td>
+        <td>FR-1.6</td>
+      </tr>
+        <tr>
+        <td>V-6c</td>
+        <td>User prompts app to show interesting locations</td>
+        <td>App displays lists of locations along route</td>
+        <td>FR-1.6</td>
+      </tr>
+        <tr>
+        <td>V-7</td>
+        <td>User requests itinerary planner</td>
+        <td>App generates itinerary based on user’s location</td>
+        <td>FR-2.1</td>
+      </tr>
+        <tr>
+        <td>V-8</td>
+        <td>User request itinerary planner with forecasted weather</td>
+        <td>App generates itinerary considering weather conditions</td>
+        <td>FR-2.2</td>
+      </tr>
+        <tr>
+        <td>V-9</td>
+        <td>User sets preference (e.g., museums, vegetarian restaurants)</td>
+        <td>App generates itinerary reflecting using preferences</td>
+        <td>FR-2.3</td>
+      </tr>
+        <tr>
+        <td>V-10</td>
+        <td>User requests restaurant recommendation</td>
+        <td>App verifies restaurants is open before recommending</td>
+        <td>FR-2.4</td>
+      </tr>
+        <tr>
+        <td>V-11a</td>
+        <td>User saves itinerary</td>
+        <td>Itinerary is saved and accessible later</td>
+        <td>FR-2.5</td>
+      </tr>
+        <tr>
+        <td>V-11b</td>
+        <td>User edits saved itinerary</td>
+        <td>Itinerary updates with new changes, and changes are accessible later</td>
+        <td>FR-2.5</td>
+      </tr>
+        <tr>
+        <td>V-12a</td>
+        <td>User runs app on iOS or Android</td>
+        <td>App launches successfully</td>
+        <td>NFR-1</td>
+      </tr>
+        <tr>
+        <td>V-12b</td>
+        <td>Users runs app on Chrome, Firefox, or Safari</td>
+        <td>App launches successfully</td>
+        <td>NFR-1</td>
+      </tr>
+        <tr>
+        <td>V-13a</td>
+        <td>User requests itinerary</td>
+        <td>Itinerary returned within 10 seconds</td>
+        <td>NFR-2</td>
+      </tr>
+      </tr>
+        <tr>
+        <td>V-13b</td>
+        <td>User modifies itinerary</td>
+        <td>Updated itinerary returned within 10 seconds</td>
+        <td>NFR-2</td>
+        </tr>
+        </tr>
+        <tr>
+        <td>V-14</td>
+        <td>1000 users generate itineraries concurrently</td>
+        <td>System supports load without failure, returning itineraries for all within 10 seconds</td>
+        <td>NFR-3</td>
+      </tr>
+        </tr>
+        <tr>
+        <td>V-15</td>
+        <td>User bandwidth drops below 1 Mbps</td>
+        <td>App enters low-bandwidth mode, prioritizing test over images</td>
+        <td>NFR-4</td>
+      </tr>
+        </tr>
+        <tr>
+        <td>V-16a</td>
+        <td>User login request</td>
+        <td>Login succeeds or fails within 10 seconds</td>
+        <td>NFR-5</td>
+      </tr>
+        </tr>
+        <tr>
+        <td>V-16b</td>
+        <td>Other API request</td>
+        <td>Request succeeds or fails within 30 seconds</td>
+        <td>NFR-5</td>
+      </tr>
+        </tr>
+        <tr>
+        <td>V-17</td>
+        <td>User connects to app</td>
+        <td>Connection is encrypted</td>
+        <td>NFR-8</td>
+      </tr>
+        </tr>
+        <tr>
+        <td>V-18</td>
+        <td>Sensitive user data stored</td>
+        <td>Data is encrypted at rest</td>
+        <td>NFR-9</td>
+      </tr>
+        </tr>
+        <tr>
+        <td>V-19</td>
+        <td>Backend service generates logs</td>
+        <td>hello</td>
+        <td>Logs are available in monitoring platform</td>
+      </tr>
+    </table>
 
-    <p>The team’s rationale follows a few key software-architecture principles:</p>
-    <ul>
-        <li>Separation of process and control concerns (Garlan &amp; Shaw, 1993) to help manage complexity</li>
-        <li>Feedback-control design (Higgins in Shaw &amp; Garlan Case Studies) to maintain system stability</li>
-        <li>Quality-driven architecture (Pressman, 2010) to align implementation with safety, reliability, and maintainability goals.</li>
-    </ul>
+    <p>Some of the non-functional requirements are not directly testable and were not included in these tests. These non-functional requirements are NFR-6 (Downtime) and NFR-7 (RTO/RPO). </p>
 
-    <h3>Rationale for Architectural Style Selection</h3>
-    <p>After analyzing use cases and requirements, the team selected a Main Program and Subroutine style with Shared Data as the proposed system foundation. This decision was guided by the need for a central controller that could coordinate shared data between modules such as the detection subsystem, distance control, and fault handling. The shared-data model helps to ensure efficient communication between the different modules and supports the necessary real-time updates without having a large overhead for message passing.</p>
-
-    <p>However, the nature of the proposed system also required real-time feedback loops which are intrinsic in feedback-control architectures as referenced in Garlan and Shaw’s comparison of architectural styles. Therefore, the team’s ACC design adopts a hybrid architecture by combining centralized coordination with localized feedback loops for real-time responsiveness. This approach allows the team to balance modularity and performance where the individual modules handle all environmental sensing and decision logic, while the main program maintains and ensures consistent coordination. Finally, this architectural style choice meets several functional and non-functional requirements:</p>
-
-    <ul>
-        <li>FR-01 and FR-02 by enabling high frequency sensor fusion and propagation of range/range-rate data to control modules.</li>
-        <li>NFR-P1 and NFR-p2 through bounded end-to-end latency and deterministic control cycle scheduling.</li>
-        <li>NFR-S1 and NFR-S2 by providing predictable fault handling paths in which the main supervisor enforces fail-silent behavior.</li>
-        <li>NFR-M1 and NFR-M2 by encapsulating each module separately with well-defined and well-designed interfaces allowing easier debugging and logging efforts.</li>
-    </ul>
-
-    <p>The team evaluated alternative architectures before choosing the hybrid approach. A layered architecture was considered as it offered good separation of abstraction, but it also introduces latency which was deemed unsuitable for safety reasons. The team also considered an event-driven system because it would increase flexibility within the system; however, it overall complicates the synchronization across the continuous feedback loops, making it a poor choice. Therefore, the hybrid design was chosen as the best fit for the project to meet the system’s real-time needs and safety requirements.</p>
-
-    <h3>Module-Level Design Decisions and Rationale</h3>
-
-    <h4>Basic Cruise Control Module</h4>
-    <p>The Basic Cruise Control Module was modeled as a feedback-control architecture to continuously monitor and adjust vehicle speed relative to a driver-set target. This aligns with Higgins’ model of feedback control where the system compares actual speed against the reference and compensates accordingly. The feedback loop allows the team’s system to respond effectively and efficiently to gradients and external disturbances while still maintaining the driver-set target speed.</p>
-
-    <p>This decision allows the team to satisfy all the key functional requirements of this module, outlined on Page 3, including FR-16 and FR-17, and it brings added reliability and accuracy to the system. The trade-off of this decision is that there is added computational overhead because of the continuous monitoring, but the team determined that this cost is worth taking on because the feedback control architecture provides measurable improvements in performance consistency as well as driver comfort.</p>
-
-    <h4>Detection &amp; Distance Control Module</h4>
-    <p>The Detection and Distance Control Module is central to the adaptive aspect of the system. The team decided to implement this module using a sensor-driven feedback control loop, which combines the radar and environmental data to determine a safe following distance. The feedback structure of this module, as shown in the Detection and Distance Control Module Based on Feedback Control Loop Figure, enables real-time adjustments as the lead vehicle accelerates, decelerates, or exits the lane.</p>
-
-    <p>This design choice directly addresses each of the functional requirements for this module, directly fulfilling FR-01, FR-02, FR-03, FR-04, and FR05, and goes further to ensure added safety, responsiveness, and precision. The system’s use of continuously updated range-rate data supports the necessary adaptive behavior that is consistent with the process-control design patterns previously touched on. Although the team did consider a rule-based decision system, this chosen design was a better fit because it offers smoother control transitions and allows the architecture to evolve as sensors continue to evolve too, compared to the rule-based design which would limit responsiveness as well as scalability.</p>
-
-    <h4>Fault Handling Module</h4>
-    <p>For fault handling, the team adopted a fault tolerant monitoring and exception handling subsystem that can integrate with the existing shared-data architecture. The module monitors sensor integrity, actuator feedback, and overall network health. This monitoring system allows the system to detect when performance issues arise, and it can trigger alerts and safely disengage the ACC.</p>
-
-    <p>This design meets all the functional requirements listed on Page 3 for the Fault Handling Module, directly fulfilling FR-14, FR-15, and ensuring compliance with NFR-S1 and NFR-S2. Additionally, the design adds dependability and safety to the overall system. The team chose this design because it offers a proactive monitoring mechanism as opposed to a passive error reporting system, because the proactive monitoring allows timely intervention to improve the safety of the system. Although this module design does add diagnostic complexity, it is worth eating this cost because of the added risk reduction.</p>
-
-    <h4>Driver Interface Module</h4>
-    <p>The Driver Interface Module was designed with human factors in mind, focusing on clarity and minimal cognitive load for the drivers. The team chose to use a status-drive interaction design for this module to show the ACC states, such as active, standby, and error, in a format that would be intuitive and easy to understand for humans. The module supports user inputs as well, so the driver can make speed and distance adjustments and receive transparent information about the system’s behavior to stay informed.</p>
-
-    <p>This design addresses all the functional requirements listed on Page 3 for the Driver Interface Module, directly fulfilling FR-03, FR-11, FR-12, and FR-13, and usability metrics NFR-U1 and NFR-U2. Additionally, the design adds additional quality attributes like usability, understandability, and safety to the system. The team chose this design because it ensures simplicity over feature density, preventing featuritis, limiting driver distraction, and reducing complexity and overhead. This aligns well with Pressman’s emphasis on designing human factors and maintainability with software quality framework which fed into the team’s decision as well.</p>
-
-    <h3>Key Quality Attributes and Trade-offs</h3>
-    <p>The ACC architecture was designed to satisfy multiple quality attributes while balancing several competing priorities:</p>
-    <ul>
-        <li><strong>Safety &amp; Reliability:</strong> The redundant sensing and feedback loops in the team’s system guarantee system responsiveness under ever changing, dynamic, and unpredictable road conditions. This supports FR-05, FR-14, FR-15, NFR-S1, NFR-S2, NFR-R1, and NFR-R2. The tradeoff of these attributes is that they require additional CPU overhead for safety tasks.</li>
-        <li><strong>Modularity &amp; Maintainability:</strong> The hybrid architectural structure allows individual modules to be updated without the team having to redesign the entire system. This supports NFR-M1 and NFR-M2. The tradeoff of these attributes is that they bring about additional logging storage.</li>
-        <li><strong>Performance, Efficiency, and Timing:</strong> The continuous data processing required by this system is very computationally heavy and intensive, but the team’s modular optimization approach helps to minimize latency. This supports FR-02, FR-07, FR-10, NFR-P1, NFR-P2, and NFR-P3. The tradeoff of these attributes is that they require tight scheduling complexity.</li>
-        <li><strong>Usability:</strong> The clear driver feedback and fault alerts improve the trust and control of both the system and the driver. This supports FR-03, FR-13, NFR-U1, and NFR-U2. The tradeoff of this attribute is that it reduces display customization on the drive interface, but the simplicity is worth it.</li>
-        <li><strong>Scalability:</strong> The shared-data approach supports flexibility for future extensions and enhancements, such as staying in the lane feature or avoiding collisions feature. This supports FR-01, FR-02, and NFR-M1. The tradeoff of this attribute is that it does introduce some complexity for future sensor integration efforts.</li>
-    </ul>
-
-    <p>The trade-offs in the system that the team had to take on primarily include balancing computational complexity with safety and responsiveness, but given the nature of the ACC system, the team decided that safety and responsiveness are of the utmost importance. The chosen architecture favors reliability and safety over raw performance, which is also consistent with real-world automotive system priorities based on past readings and case studies.</p>
-
-    <h3>Alternative Design Considerations</h3>
-    <p>The team did consider alternative architectures, such as fully event-driven or layered systems, but ultimately decided that these choices brought about too many synchronization and timing constraints. The team also considered a client-server design because it could separate sensor data acquisition from control logic, but it would introduce too much latency and single point of failure risks, thus reducing the overall safety of the system. The current hybrid structure that the team chose provides a practical compromise and trade-off decision that preserves responsiveness and safety while maintaining extensibility and scalability in the future.</p>
-
-    <h3>Conclusion of Design Rationale</h3>
-    <p>The design decisions documented here collectively reflect the team’s goal of delivering a robust, modular fault tolerant ACC system. The hybrid architecture ensures real-time responsiveness, while individual module designs enhance safety (NFR-S1-S2), usability (NFR-U1-U2), and maintainability (NFR-M1-M2) objectives while delivering on all functional behaviors (FR-01-FR-17) such as dynamic gap control, speed maintenance, fault detection, and driver transparency. Every major design decision that the team decided on was to align with these functional and non-functional requirements and follows the process-control principles by following a clear separation of concerns and feedback-driven adaptability within the system.</p>
 </div>
 </body>
 </html>
+
 
 
 
