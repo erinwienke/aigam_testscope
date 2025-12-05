@@ -22,24 +22,29 @@
 <h2>Test Plan</h2>
 
 <p>
-    A driver embarks on a commuting trip on the highway in the morning and activates the ACC. As the distance between vehicles changes due to traffic patterns, the ACC will adjust the speed of the vehicle as needed to maintain the proper distance and follow the vehicle in front. By using the ACC, the driver doesn’t have to apply the brake pedal or accelerator at the same frequency, which makes the driving experience easier and more pleasant.
+    To verify that the itinerary system behaves correctly end-to-end while meeting key non-functional
+    requirements, we recommend a phased integration-first approach. Phase one focuses on backend integration
+    testing with external systems, covering the User, Recommendation, Itinerary, Mapping, Weather, and Notification
+    services, along with the message bus, message queue, and external providers for AI, mapping, weather, and push notifications.
+    Test cases BE-1 through BE-11 validate secure CRUD operations, context assembly, and AI calls, fallback behavior when primary
+    providers fail, itinerary generation and event publishing, routing across multiple transport modes, caching and retry behavior
+    for asynchronous jobs, and traceable logging across a full itinerary flow. This phase confirms that the backend module can orchestrate
+    its dependencies reliably and that critical resilience mechanisms, such as fallback providers and retries, behave as expected
+    under both normal and degraded conditions.
 </p>
 
-<p>
-    While the driver is cruising in moderate traffic following another vehicle at a predefined distance, the ACC detects a vehicle or object that moves slower or in a different direction than the vehicle being followed. In this instance, rather than holding the previously set speed, the ACC will gently decelerate the vehicle at the appropriate pace. Once the slower vehicle is no longer a consideration, the ACC will return to the configured speed without the driver acting in any manner. This early adaptive approach helps to prevent rear-end collisions and increases the driver's confidence and comfort.
-</p>
-
-<p>
-    In the case of a long drive, the driver, while in ACC mode, can press down on the accelerator pedal to temporarily increase the speed above the preset speed. The ACC realizes that the driver intended an acceleration and allows it to happen, and once the driver releases the accelerator pedal, the system will maintain the previously set speed until the driver changes the speed again. This ability to temporarily change the speed while the adaptive cruise control is active allows the driver to respond to short-term conditions on the roadway.
-</p>
-
-<p>
-    One of the sensors becomes obstructed or blocked while driving. The driver enters or is already in ACC mode with the obstructed sensor. The system will then issue several warnings and notifications that manual driving mode will be reenabled until ACC sensor compliance can be reached. This prioritizes the driver’s safety and wellbeing because the system may not work as intended in this scenario.
-</p>
-    <figure>
-    <img src="images/adaptive-cruise-control.jpg" alt="Module Overview of the Adaptive Cruise Control system">
-    <figcaption>Figure – Image Depiction of the Adaptive Cruise Control system</figcaption>
-</figure>
+    <p>
+        Phase Two validates middleware integration between the frontend and backend, ensuring that API Gateway and Router, Request Validator,
+        Data Normalizer, Cache Manager, API Integrator, and Proxy correctly route, validate, cache, and transform requests and responses.
+        Test cases MW-1 through MW-15 verify the accurate routing of valid and invalid requests, the correct handling of asynchronous AI tasks,
+        cache hits and misses, weather and preference mapping, validation and repair of AI responses, load balancing and failover, as well as
+        the enforcement of HTTPS and timeout policies. Phase Three (FI-1 through FI-10) then verifies that the frontend user interface correctly
+        presents navigation and itinerary features, including map centering, route calculation, multi-stop and multi-mode navigation, recommendations,
+        itinerary creation, saving and editing, and weather-aware planning. Finally, the Validation and Full System tests (V-1 through V-19) confirm that
+        the complete system meets the defined functional and non-functional requirements, including performance, concurrency, bandwidth handling, security,
+        and logging. Some non-functional requirements, such as NFR-6 (downtime) and NFR-7 (RTO/RPO), are not directly testable through discrete test cases
+        and would be verified instead through long-term monitoring and operational metrics.
+    </p>
 
 </div>
 </body>
