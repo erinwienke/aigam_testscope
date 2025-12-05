@@ -48,170 +48,170 @@
     <h2>Test Skeleton</h2>
 
     <table>
-
-     <tr>
-        <th>Test Case ID</th>
-         <th>Test Objective</th>
-        <th>Test Description</th>
-        <th>Expected Results</th>
-        <th>Functional/Non-functional Requirement Satisfied</th>
-      </tr>
-      <tr>
-        <td>BE-1</td>
-        <td>Verify User Service CRUD and secure persistence<td>
-        <td>Using the test harness, call User Service (B1) to create a new user profile with preferences and an empty itinerary, retrieve it, update a field (e.g., budget), then delete it</td>
-        <td>
-            <ol>
-                <li>Create/Read/Update/Delete operations succeed via API </li>
-                <li>Retrieved data matches submitted fields</li>
-                <li>Service emits structured logs for each operation</li>
-                <li>Data is stored in the primary database with encryption-at-rest enabled (checked via DB config/metadata, not raw values)</li>
-            </ol>
-        </td>
-        <td>FR-2.3, FR-2.5, NFR-7, NFR-9, NFR-10</td>
-      </tr>
-    <tr>
-        <td>BE-2</td>
-        <td>Ensure Recommendation Service assembles full context and calls AI<td>
-        <td>Enqueue an itinerary-generation job for Recommendation Service (B2) with a minimal payload (location + time). B2 should fetch user preferences from B1 and weather from B5, then call the external AI model</td>
-        <td>
-            <ol>
-                <li>B2 issues requests to B1 and B5 to build full context  </li>
-                <li>External AI model is invoked with combined context </li>
-                <li>AI response is returned to B2 in normalized format </li>
-                <li>Errors are logged if any dependency fails</li>
-            </ol>
-        </td>
-        <td>FR-2.1, FR-2.2, FR-2.3, NFR-2, NFR-3, NFR-10</td>
-      </tr>
-    <tr>
-        <td>BE-3</td>
-        <td>Validate AI model fallback path<td>
-        <td>Configure primary AI endpoint to return an error or timeout. Trigger a recommendation job as in BE-2</td>
-        <td>
-            <ol>
-                <li>B2 detects failure from primary AI provider</li>
-                <li>B2 automatically calls backup AI model </li>
-                <li>A valid recommendation list is still produced</li>
-                <li>Logs clearly indicate primary failure and fallback usage</li>
-            </ol>
-        </td>
-        <td>FR-2.1, NFR-2, NFR-3, NFR-6, NFR-10</td>
-      </tr>
-    <tr>
-        <td>BE-4</td>
-        <td>Verify Itinerary Service transforms recommendations into a logical plan</td>
-        <td>Feed Itinerary Service (B3) a mock ranked list of recommendations from B2 via its API. Include activities that are impossible or out-of-hours to trigger sanity checks</td>
-        <td>
-            <ol>
-                <li>B3 performs sanity checks (e.g., filters closed venues / impossible times)</li>
-                <li>B3 orders activities to minimize travel time and produce a sequential itinerary</li>
-                <li>B3 saves final itinerary via B1</li>
-                <li>B3 publishes an ItineraryUpdated event to the message bus</li>
-            </ol>
-        </td>
-        <td>FR-1.4, FR-2.4, FR-2.5, NFR-2, NFR-3, NFR-6, NFR-10</td>
-      </tr>
-    <tr>
-        <td>BE-5</td>
-        <td>Validate Mapping Service navigation + multi-stop routing</td>
-        <td>Call Mapping Service (B4) directly with origin, destination, and intermediate waypoints for multiple transport modes (driving/walking/transit)</td>
-        <td>
-            <ol>
-                <li>For each mode, B4 returns routes and turn-by-turn directions from external mapping provider</li>
-                <li>Routes include all intermediate stops</li>
-                <li>Response format is normalized for frontend use (e.g., consistent JSON fields)</li>
-            </ol>
-        </td>
-        <td>FR-1.4, FR-2.4, FR-2.5, NFR-2, NFR-3, NFR-6, NFR-10</td>
-      </tr>
-    <tr>
-        <td>BE-6</td>
-        <td>Validate Mapping Service fallback provider</td>
-        <td>Simulate primary mapping provider being unavailable (error/timeout) and re-run BE-5</td>
-        <td>
-            <ol>
-                <li>B4 detects primary provider failure</li>
-                <li>B4 routes request to backup provider</li>
-                <li>Valid route and directions are still returned </li>
-                <li>Logs capture primary provider failure and fallback activation</li>
-            </ol>
-        </td>
-        <td>FR-1.1, FR-1.3, FR-1.4, FR-1.5, NFR-2, NFR-10</td>
-      </tr>
-    <tr>
-        <td>BE-7</td>
-        <td>Verify Weather Service forecast retrieval and caching </td>
-        <td>Call Weather Service (B5) for forecast data for a location twice in succession, then again after a cache-expiry window</td>
-        <td>
-            <ol>
-                <li>First call fetches data from external weather provider</li>
-                <li>Second call returns cached result (no external call or clearly flagged as cache hit)</li>
-                <li>After expiry, Weather Service refreshes from provider</li>
-                <li>Service exposes current/forecast conditions in normalized format</li>
-            </ol>
-        </td>
-        <td>FR-2.2, NRF-2, NFR-3, NFR-6, NFR-10</td>
-      </tr>
-    <tr>
-        <td>BE-8</td>
-        <td>Validate async job handling via message queue</td>
-        <td>Push several itinerary-generation jobs onto the message queue for B2. Intentionally make one job fail once (e.g., temporary AI error) to test retry behavior</td>
-        <td>
-            <ol>
-                <li>Each job is dequeued and processed by B2</li>
-                <li>Failed job is retried according to queue policy</li>
-                <li>Successfully processed jobs result in recommendations being produced and handed off to B3</li>
-                <li>Queue metrics and logs reflect job status (success/retry/failure)</li>
-            </ol>
-        </td>
-        <td>FR-2.1, FR-2.2, FR-2.3, NFR-2, NFR-3, NFR-6, NFR-10</td>
-      </tr>
-    <tr>
-        <td>BE-9</td>
-        <td>Verify Notification Service reacts to itinerary updates</td>
-        <td>After running BE-4, ensure ItineraryUpdated events appear on the message bus. Start Notification Service (B6) subscribed to the relevant topic and simulate a reachable push provider</td>
-        <td>
-            <ol>
-                <li>B6 receives ItineraryUpdated event from bus</li>
-                <li>B6 requests user’s push token from B1</li>
-                <li>B6 sends a notification payload to the external push notification service</li>
-                <li>Logs show event receipt, token fetch, and push call</li>
-            </ol>
-        </td>
-        <td>FR-2.5, NFR-6, NFR-10</td>
-      </tr>
-    <tr>
-        <td>BE-10</td>
-        <td>Validate backend logging and traceability across a fully itinerary flow</td>
-        <td>Trigger a “happy path” backend-only flow: create user (B1) → enqueue recommendation job (queue → B2) → generate itinerary (B3/B4/B5) → save + publish event → send notification (B6)</td>
-        <td>
-            <ol>
-                <li>All involved services emit structured logs for their operations </li>
-                <li>A common correlation ID or equivalent can be used to trace the full flow across logs</li>
-                <li>The complete flow runs without backend errors</li>
-            </ol>
-        </td>
-        <td>FR-2.1, FR-2.2, FR-2.3, FR-2.4, FR-2.5, NFR-6, NFR-10</td>
-      </tr>
-    <tr>
-        <td>BE-11</td>
-        <td>Backend performance smoke test for itinerary generation </td>
-        <td>Using the harness, run several parallel itinerary-generation jobs (through queue + B2 + B3) under a light-to-moderate load and measure time from job enqueue to itinerary persistence</td>
-        <td>
-            <ol>
-                <li>Median processing time per itinerary is within the 10-second target for backend-only scope</li>
-                <li>Recommendation and Itinerary Services scale horizontally (no single node saturation) based on deployment configuration</li>
-            </ol>
-        </td>
-        <td>NFR-2, NFR-3, NFR-6</td>
-      </tr>
-        </table>
+        <tr>
+            <th>Test Case ID</th>
+            <th>Test Objective</th>
+            <th>Test Description</th>
+            <th>Expected Results</th>
+            <th>Functional/Non-functional Requirement Satisfied</th>
+        </tr>
+        <tr>
+            <td>BE-1</td>
+            <td>Verify User Service CRUD and secure persistence<td>
+            <td>Using the test harness, call User Service (B1) to create a new user profile with preferences and an empty itinerary, retrieve it, update a field (e.g., budget), then delete it</td>
+            <td>
+                <ol>
+                    <li>Create/Read/Update/Delete operations succeed via API </li>
+                    <li>Retrieved data matches submitted fields</li>
+                    <li>Service emits structured logs for each operation</li>
+                    <li>Data is stored in the primary database with encryption-at-rest enabled (checked via DB config/metadata, not raw values)</li>
+                </ol>
+            </td>
+            <td>FR-2.3, FR-2.5, NFR-7, NFR-9, NFR-10</td>
+        </tr>
+        <tr>
+            <td>BE-2</td>
+            <td>Ensure Recommendation Service assembles full context and calls AI<td>
+            <td>Enqueue an itinerary-generation job for Recommendation Service (B2) with a minimal payload (location + time). B2 should fetch user preferences from B1 and weather from B5, then call the external AI model</td>
+            <td>
+                <ol>
+                    <li>B2 issues requests to B1 and B5 to build full context  </li>
+                    <li>External AI model is invoked with combined context </li>
+                    <li>AI response is returned to B2 in normalized format </li>
+                    <li>Errors are logged if any dependency fails</li>
+                </ol>
+            </td>
+            <td>FR-2.1, FR-2.2, FR-2.3, NFR-2, NFR-3, NFR-10</td>
+        </tr>
+        <tr>
+            <td>BE-3</td>
+            <td>Validate AI model fallback path<td>
+            <td>Configure primary AI endpoint to return an error or timeout. Trigger a recommendation job as in BE-2</td>
+            <td>
+                <ol>
+                    <li>B2 detects failure from primary AI provider</li>
+                    <li>B2 automatically calls backup AI model </li>
+                    <li>A valid recommendation list is still produced</li>
+                    <li>Logs clearly indicate primary failure and fallback usage</li>
+                </ol>
+            </td>
+            <td>FR-2.1, NFR-2, NFR-3, NFR-6, NFR-10</td>
+        </tr>
+        <tr>
+            <td>BE-4</td>
+            <td>Verify Itinerary Service transforms recommendations into a logical plan</td>
+            <td>Feed Itinerary Service (B3) a mock ranked list of recommendations from B2 via its API. Include activities that are impossible or out-of-hours to trigger sanity checks</td>
+            <td>
+                <ol>
+                    <li>B3 performs sanity checks (e.g., filters closed venues / impossible times)</li>
+                    <li>B3 orders activities to minimize travel time and produce a sequential itinerary</li>
+                    <li>B3 saves final itinerary via B1</li>
+                    <li>B3 publishes an ItineraryUpdated event to the message bus</li>
+                </ol>
+            </td>
+            <td>FR-1.4, FR-2.4, FR-2.5, NFR-2, NFR-3, NFR-6, NFR-10</td>
+        </tr>
+        <tr>
+            <td>BE-5</td>
+            <td>Validate Mapping Service navigation + multi-stop routing</td>
+            <td>Call Mapping Service (B4) directly with origin, destination, and intermediate waypoints for multiple transport modes (driving/walking/transit)</td>
+            <td>
+                <ol>
+                    <li>For each mode, B4 returns routes and turn-by-turn directions from external mapping provider</li>
+                    <li>Routes include all intermediate stops</li>
+                    <li>Response format is normalized for frontend use (e.g., consistent JSON fields)</li>
+                </ol>
+            </td>
+            <td>FR-1.4, FR-2.4, FR-2.5, NFR-2, NFR-3, NFR-6, NFR-10</td>
+        </tr>
+        <tr>
+            <td>BE-6</td>
+            <td>Validate Mapping Service fallback provider</td>
+            <td>Simulate primary mapping provider being unavailable (error/timeout) and re-run BE-5</td>
+            <td>
+                <ol>
+                    <li>B4 detects primary provider failure</li>
+                    <li>B4 routes request to backup provider</li>
+                    <li>Valid route and directions are still returned </li>
+                    <li>Logs capture primary provider failure and fallback activation</li>
+                </ol>
+            </td>
+            <td>FR-1.1, FR-1.3, FR-1.4, FR-1.5, NFR-2, NFR-10</td>
+        </tr>
+        <tr>
+            <td>BE-7</td>
+            <td>Verify Weather Service forecast retrieval and caching </td>
+            <td>Call Weather Service (B5) for forecast data for a location twice in succession, then again after a cache-expiry window</td>
+            <td>
+                <ol>
+                    <li>First call fetches data from external weather provider</li>
+                    <li>Second call returns cached result (no external call or clearly flagged as cache hit)</li>
+                    <li>After expiry, Weather Service refreshes from provider</li>
+                    <li>Service exposes current/forecast conditions in normalized format</li>
+                </ol>
+            </td>
+            <td>FR-2.2, NRF-2, NFR-3, NFR-6, NFR-10</td>
+        </tr>
+        <tr>
+            <td>BE-8</td>
+            <td>Validate async job handling via message queue</td>
+            <td>Push several itinerary-generation jobs onto the message queue for B2. Intentionally make one job fail once (e.g., temporary AI error) to test retry behavior</td>
+            <td>
+                <ol>
+                    <li>Each job is dequeued and processed by B2</li>
+                    <li>Failed job is retried according to queue policy</li>
+                    <li>Successfully processed jobs result in recommendations being produced and handed off to B3</li>
+                    <li>Queue metrics and logs reflect job status (success/retry/failure)</li>
+                </ol>
+            </td>
+            <td>FR-2.1, FR-2.2, FR-2.3, NFR-2, NFR-3, NFR-6, NFR-10</td>
+        </tr>
+        <tr>
+            <td>BE-9</td>
+            <td>Verify Notification Service reacts to itinerary updates</td>
+            <td>After running BE-4, ensure ItineraryUpdated events appear on the message bus. Start Notification Service (B6) subscribed to the relevant topic and simulate a reachable push provider</td>
+            <td>
+                <ol>
+                    <li>B6 receives ItineraryUpdated event from bus</li>
+                    <li>B6 requests user’s push token from B1</li>
+                    <li>B6 sends a notification payload to the external push notification service</li>
+                    <li>Logs show event receipt, token fetch, and push call</li>
+                </ol>
+            </td>
+            <td>FR-2.5, NFR-6, NFR-10</td>
+        </tr>
+        <tr>
+            <td>BE-10</td>
+            <td>Validate backend logging and traceability across a fully itinerary flow</td>
+            <td>Trigger a “happy path” backend-only flow: create user (B1) → enqueue recommendation job (queue → B2) → generate itinerary (B3/B4/B5) → save + publish event → send notification (B6)</td>
+            <td>
+                <ol>
+                    <li>All involved services emit structured logs for their operations </li>
+                    <li>A common correlation ID or equivalent can be used to trace the full flow across logs</li>
+                    <li>The complete flow runs without backend errors</li>
+                </ol>
+            </td>
+            <td>FR-2.1, FR-2.2, FR-2.3, FR-2.4, FR-2.5, NFR-6, NFR-10</td>
+        </tr>
+        <tr>
+            <td>BE-11</td>
+            <td>Backend performance smoke test for itinerary generation </td>
+            <td>Using the harness, run several parallel itinerary-generation jobs (through queue + B2 + B3) under a light-to-moderate load and measure time from job enqueue to itinerary persistence</td>
+            <td>
+                <ol>
+                    <li>Median processing time per itinerary is within the 10-second target for backend-only scope</li>
+                    <li>Recommendation and Itinerary Services scale horizontally (no single node saturation) based on deployment configuration</li>
+                </ol>
+            </td>
+            <td>NFR-2, NFR-3, NFR-6</td>
+        </tr>
+    </table>
     
 </div>
 </body>
 
 </html>
+
 
 
 
