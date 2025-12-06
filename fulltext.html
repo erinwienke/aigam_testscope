@@ -28,79 +28,95 @@
     <div id="phase4"></div>
 
     <script>
-      const includes = [
-        { file: 'scope.html', elementId: 'testScope', elevate: true },
-        { file: 'plan.html', elementId: 'testPlan', elevate: true },
-        { file: 'phaseone.html', elementId: 'phase1', elevate: false },
-        { file: 'phasetwo.html', elementId: 'phase2', elevate: false },
-        { file: 'phasethree.html', elementId: 'phase3', elevate: false },
-        { file: 'phasefour.html', elementId: 'phase4', elevate: false },
-      ];
+  const includes = [
+    { file: 'scope.html',     elementId: 'testScope', elevate: true  },
+    { file: 'plan.html',      elementId: 'testPlan',  elevate: true  },
+    { file: 'phaseone.html',  elementId: 'phase1',    elevate: false },
+    { file: 'phasetwo.html',  elementId: 'phase2',    elevate: false },
+    { file: 'phasethree.html',elementId: 'phase3',    elevate: false },
+    { file: 'phasefour.html', elementId: 'phase4',    elevate: false },
+  ];
 
-      const seenHeadings = new Set();
+  // 🔹 Tracks which H1 texts we’ve already used somewhere
+  const seenH1Headings = new Set();
 
-      document.querySelectorAll("h1, h2").forEach(h => {
-        const key = h.textContent.trim();
-        if (key) seenHeadings.add(key);
-      });
+  // OPTIONAL: if you want the main fulltext.html's <h1> to count as “first”
+  // (e.g., AIGAM Test, Full Text), seed from existing H1s:
+  document.querySelectorAll("h1").forEach(h => {
+    const key = h.textContent.trim();
+    if (key) seenH1Headings.add(key);
+  });
 
-      includes.forEach(({ file, elementId, elevate }) => {
-        fetch(file)
-          .then(res => res.text())
-          .then(html => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, "text/html");
-            const container = doc.querySelector(".container");
-            if (!container) return;
+  includes.forEach(({ file, elementId, elevate }) => {
+    fetch(file)
+      .then(res => res.text())
+      .then(html => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
 
-            const clone = container.cloneNode(true);
+        const container = doc.querySelector(".container");
+        if (!container) {
+          console.warn(`${file} has no .container div`);
+          return;
+        }
 
-            clone.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach(h => {
-              const key = h.textContent.trim();
-              if (!key) return;
+        const clone = container.cloneNode(true);
 
-              if (seenHeadings.has(key)) {
-                h.remove();
-              } else {
-                seenHeadings.add(key);
-              }
-            });
+        // 1️⃣ REMOVE ONLY DUPLICATE H1s (first occurrence wins)
+        clone.querySelectorAll("h1").forEach(h => {
+          const key = h.textContent.trim();
+          if (!key) return;
 
-            if (elevate) {
-              const headings = Array.from(
-                clone.querySelectorAll("h1, h2, h3, h4, h5, h6")
-              );
+          if (seenH1Headings.has(key)) {
+            // We've already seen this H1 text in an earlier file → drop it here
+            h.remove();
+          } else {
+            // First time we see this H1 text (in includes order) → keep it
+            seenH1Headings.add(key);
+          }
+        });
 
-              if (headings.length > 0) {
-                const minLevel = Math.min(
-                  ...headings.map(h => parseInt(h.tagName[1], 10))
-                );
+        // 2️⃣ ELEVATE HEADINGS (ONLY for scope + plan)
+        if (elevate) {
+          const headings = Array.from(
+            clone.querySelectorAll("h1, h2, h3, h4, h5, h6")
+          );
 
-                const shift = minLevel - 1; // e.g., h2 → h1
+          if (headings.length > 0) {
+            // Find smallest level present: e.g., h2 => 2, h3 => 3
+            const minLevel = Math.min(
+              ...headings.map(h => parseInt(h.tagName[1], 10))
+            );
 
-                if (shift > 0) {
-                  headings.forEach(h => {
-                    const oldLevel = parseInt(h.tagName[1], 10);
-                    let newLevel = Math.max(1, oldLevel - shift);
+            const shift = minLevel - 1; // h2 => shift=1 so h2→h1, h3→h2, etc.
 
-                    const newTag = document.createElement("h" + newLevel);
-                    newTag.innerHTML = h.innerHTML;
+            if (shift > 0) {
+              headings.forEach(h => {
+                const oldLevel = parseInt(h.tagName[1], 10);
+                let newLevel = oldLevel - shift;
+                if (newLevel < 1) newLevel = 1;
 
-                    // copy over attributes
-                    for (const attr of h.attributes) {
-                      newTag.setAttribute(attr.name, attr.value);
-                    }
+                const newTag = document.createElement("h" + newLevel);
 
-                    h.replaceWith(newTag);
-                  });
+                // Copy attributes
+                for (const attr of h.attributes) {
+                  newTag.setAttribute(attr.name, attr.value);
                 }
-              }
-            }
+                // Preserve inner content
+                newTag.innerHTML = h.innerHTML;
 
-            document.getElementById(elementId).innerHTML = clone.innerHTML;
-          });
-      });
-    </script>
+                h.replaceWith(newTag);
+              });
+            }
+          }
+        }
+
+        // 3️⃣ Inject the processed HTML into the combined page
+        document.getElementById(elementId).innerHTML = clone.innerHTML;
+      })
+      .catch(err => console.error(`Error loading ${file}:`, err));
+  });
+</script>
 </div>
 </body>
 
