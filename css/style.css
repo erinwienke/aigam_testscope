@@ -71,25 +71,23 @@ figcaption {
 
 /* Style all tables */
 table {
-  width: 100%;        
-  table-layout: fixed;      
-  border-collapse: separate;  
-  border-spacing: 10px;       
-  border: 1px solid black;    
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid black;
 }
 
 /* Style table headers */
 th {
   border: 1px solid black;
-  padding: 12px;           
+  padding: 12px;
   text-align: center;
-  background-color: #f0f0f0; 
+  background-color: #f0f0f0;
 }
 
 /* Style table data cells */
 td {
   border: 1px solid black;
-  padding: 12px;        
-  text-align: center;
+  padding: 12px;
+  text-align: left;
 }
 
