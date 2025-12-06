@@ -27,7 +27,7 @@
     <div id="phase3"></div>
     <div id="phase4"></div>
 
-    <script>
+<script>
   const includes = [
     { file: 'scope.html',     elementId: 'testScope', elevate: true  },
     { file: 'plan.html',      elementId: 'testPlan',  elevate: true  },
@@ -37,64 +37,61 @@
     { file: 'phasefour.html', elementId: 'phase4',    elevate: false },
   ];
 
-  // 🔹 Tracks which H1 texts we’ve already used somewhere
+  // Track which H1 texts we’ve already used (by text)
   const seenH1Headings = new Set();
 
-  // OPTIONAL: if you want the main fulltext.html's <h1> to count as “first”
-  // (e.g., AIGAM Test, Full Text), seed from existing H1s:
+  // OPTIONAL: treat existing H1s in fulltext.html as “first”
   document.querySelectorAll("h1").forEach(h => {
     const key = h.textContent.trim();
     if (key) seenH1Headings.add(key);
   });
 
-  includes.forEach(({ file, elementId, elevate }) => {
-    fetch(file)
-      .then(res => res.text())
-      .then(html => {
+  async function loadSectionsSequentially() {
+    for (const { file, elementId, elevate } of includes) {
+      try {
+        const res = await fetch(file);
+        const html = await res.text();
+
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, "text/html");
 
         const container = doc.querySelector(".container");
         if (!container) {
           console.warn(`${file} has no .container div`);
-          return;
+          continue;
         }
 
         const clone = container.cloneNode(true);
 
-        // 1️⃣ REMOVE ONLY DUPLICATE H1s (first occurrence wins)
+        // 1️⃣ Remove only duplicate H1s (first occurrence wins)
         clone.querySelectorAll("h1").forEach(h => {
           const key = h.textContent.trim();
           if (!key) return;
 
           if (seenH1Headings.has(key)) {
-            // We've already seen this H1 text in an earlier file → drop it here
-            h.remove();
+            h.remove();         // seen before → drop it
           } else {
-            // First time we see this H1 text (in includes order) → keep it
-            seenH1Headings.add(key);
+            seenH1Headings.add(key);  // first time → keep it
           }
         });
 
-        // 2️⃣ ELEVATE HEADINGS (ONLY for scope + plan)
+        // 2️⃣ Elevate headings only for scope + plan
         if (elevate) {
           const headings = Array.from(
             clone.querySelectorAll("h1, h2, h3, h4, h5, h6")
           );
 
           if (headings.length > 0) {
-            // Find smallest level present: e.g., h2 => 2, h3 => 3
             const minLevel = Math.min(
               ...headings.map(h => parseInt(h.tagName[1], 10))
             );
 
-            const shift = minLevel - 1; // h2 => shift=1 so h2→h1, h3→h2, etc.
+            const shift = minLevel - 1; // e.g. top is h2 ⇒ shift = 1
 
             if (shift > 0) {
               headings.forEach(h => {
                 const oldLevel = parseInt(h.tagName[1], 10);
-                let newLevel = oldLevel - shift;
-                if (newLevel < 1) newLevel = 1;
+                let newLevel = Math.max(1, oldLevel - shift);
 
                 const newTag = document.createElement("h" + newLevel);
 
@@ -102,7 +99,6 @@
                 for (const attr of h.attributes) {
                   newTag.setAttribute(attr.name, attr.value);
                 }
-                // Preserve inner content
                 newTag.innerHTML = h.innerHTML;
 
                 h.replaceWith(newTag);
@@ -111,11 +107,15 @@
           }
         }
 
-        // 3️⃣ Inject the processed HTML into the combined page
+        // 3️⃣ Inject processed HTML into the page
         document.getElementById(elementId).innerHTML = clone.innerHTML;
-      })
-      .catch(err => console.error(`Error loading ${file}:`, err));
-  });
+      } catch (err) {
+        console.error(`Error loading ${file}:`, err);
+      }
+    }
+  }
+
+  loadSectionsSequentially();
 </script>
 </div>
 </body>
