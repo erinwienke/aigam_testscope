@@ -37,10 +37,8 @@
     { file: 'phasefour.html', elementId: 'phase4',    elevate: false },
   ];
 
-  // Track which H1 texts we’ve already used (by text)
   const seenH1Headings = new Set();
 
-  // OPTIONAL: treat existing H1s in fulltext.html as “first”
   document.querySelectorAll("h1").forEach(h => {
     const key = h.textContent.trim();
     if (key) seenH1Headings.add(key);
@@ -63,7 +61,6 @@
 
         const clone = container.cloneNode(true);
 
-        // 1️⃣ Remove only duplicate H1s (first occurrence wins)
         clone.querySelectorAll("h1").forEach(h => {
           const key = h.textContent.trim();
           if (!key) return;
@@ -75,7 +72,6 @@
           }
         });
 
-        // 2️⃣ Elevate headings only for scope + plan
         if (elevate) {
           const headings = Array.from(
             clone.querySelectorAll("h1, h2, h3, h4, h5, h6")
@@ -86,7 +82,7 @@
               ...headings.map(h => parseInt(h.tagName[1], 10))
             );
 
-            const shift = minLevel - 1; // e.g. top is h2 ⇒ shift = 1
+            const shift = minLevel - 1;
 
             if (shift > 0) {
               headings.forEach(h => {
@@ -107,7 +103,6 @@
           }
         }
 
-        // 3️⃣ Inject processed HTML into the page
         document.getElementById(elementId).innerHTML = clone.innerHTML;
       } catch (err) {
         console.error(`Error loading ${file}:`, err);
