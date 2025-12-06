@@ -20,424 +20,87 @@
     <h1>AIGAM Test</h1>
     <h2>Full Text</h2>
 
-    <p>
-        Adaptive Cruise Control (ACC) is a complex driving assistance system that builds upon the existing Cruise Control system found in many modern vehicles. A case study on process control problems used Cruise Control as the focus and that provided the idea to expand on the present system. The current Cruise Control system maintains the driver’s speed at a set target, and it will speed up or slow down the car to maintain this target regardless of any conditions on the route.
-    </p>
+    <div id="testScope"></div>
+    <div id="testPlan"></div>
+    <div id="phase1"></div>
+    <div id="phase2"></div>
+    <div id="phase3"></div>
+    <div id="phase4"></div>
 
-    <p>
-        This system automatically adapts the vehicle’s speed based on a variety of external factors present on the roadway. The ACC system uses several sensors to achieve this and monitors the vehicles in front of it within its range as well as environmental conditions or hazards to maintain a safe distance for the driver. As a result, driving comfort and safety will increase to a greater extent than the contemporary Cruise Control System.
-    </p>
+    <script>
+      const includes = [
+        { file: 'scope.html', elementId: 'testScope', elevate: true },
+        { file: 'plan.html', elementId: 'testPlan', elevate: true },
+        { file: 'phaseone.html', elementId: 'phase1', elevate: false },
+        { file: 'phasetwo.html', elementId: 'phase2', elevate: false },
+        { file: 'phasethree.html', elementId: 'phase3', elevate: false },
+        { file: 'phasefour.html', elementId: 'phase4', elevate: false },
+      ];
 
-    <p>
-        The objective of this project is to design a software architecture for an ACC system that will combine multiple functional components to work together towards one goal. These components are the initial Cruise Control System, a hazard detection system, a distance monitoring system, a comprehensive driver display, and fault handling for safety. This design will emphasize modularity, environmentally driven outputs, and excellent fault tolerance. As a result, a hybrid system architecture that uses both feedback control loops and precise algorithms will be built to satisfy all use cases as well as functional and nonfunctional requirements.
-    </p>
-    <p>Welcome to our software architecture project for an Adaptive Cruise Control (ACC) system. This site outlines the system’s background, human-centered use cases, modular design, and fault-tolerant behavior.</p>
-    <h2>Use Cases</h2>
+      const seenHeadings = new Set();
 
-    <p>
-        A driver embarks on a commuting trip on the highway in the morning and activates the ACC. As the distance between vehicles changes due to traffic patterns, the ACC will adjust the speed of the vehicle as needed to maintain the proper distance and follow the vehicle in front. By using the ACC, the driver doesn’t have to apply the brake pedal or accelerator at the same frequency, which makes the driving experience easier and more pleasant.
-    </p>
+      document.querySelectorAll("h1, h2").forEach(h => {
+        const key = h.textContent.trim();
+        if (key) seenHeadings.add(key);
+      });
 
-    <p>
-        While the driver is cruising in moderate traffic following another vehicle at a predefined distance, the ACC detects a vehicle or object that moves slower or in a different direction than the vehicle being followed. In this instance, rather than holding the previously set speed, the ACC will gently decelerate the vehicle at the appropriate pace. Once the slower vehicle is no longer a consideration, the ACC will return to the configured speed without the driver acting in any manner. This early adaptive approach helps to prevent rear-end collisions and increases the driver's confidence and comfort.
-    </p>
+      includes.forEach(({ file, elementId, elevate }) => {
+        fetch(file)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, "text/html");
+            const container = doc.querySelector(".container");
+            if (!container) return;
 
-    <p>
-        In the case of a long drive, the driver, while in ACC mode, can press down on the accelerator pedal to temporarily increase the speed above the preset speed. The ACC realizes that the driver intended an acceleration and allows it to happen, and once the driver releases the accelerator pedal, the system will maintain the previously set speed until the driver changes the speed again. This ability to temporarily change the speed while the adaptive cruise control is active allows the driver to respond to short-term conditions on the roadway.
-    </p>
+            const clone = container.cloneNode(true);
 
-    <p>
-        One of the sensors becomes obstructed or blocked while driving. The driver enters or is already in ACC mode with the obstructed sensor. The system will then issue several warnings and notifications that manual driving mode will be reenabled until ACC sensor compliance can be reached. This prioritizes the driver’s safety and wellbeing because the system may not work as intended in this scenario.
-    </p>
-    <figure>
-        <img src="images/adaptive-cruise-control.jpg" alt="Module Overview of the Adaptive Cruise Control system">
-        <figcaption>Figure – Image Depiction of the Adaptive Cruise Control system</figcaption>
-    </figure>
-    <h2>High-Level Design</h2>
+            clone.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach(h => {
+              const key = h.textContent.trim();
+              if (!key) return;
 
-    <p>
-        When attempting to determine an architectural style for the Adaptive Cruise Control project, we first began by investigating the use cases and requirements we devised at the beginning of the project. In designing the requirements in particular, we realized that different components of the adaptive cruise control fell into five main components: the basic cruise control (from the in-class assignments), detection and distance control, fault handling, and the driver interface.
-    </p>
+              if (seenHeadings.has(key)) {
+                h.remove();
+              } else {
+                seenHeadings.add(key);
+              }
+            });
 
-    <p>
-        Based on this, we determined that the best overall architecture style was the <strong>Main program/subroutine with shared data</strong>, much like Solution 1 proposed for the KWIC System in Garlan and Shaw’s <em>An Introduction to Software Architecture</em>. The module overview of the Adaptive Cruise Control system is displayed in the figure below.
-    </p>
+            if (elevate) {
+              const headings = Array.from(
+                clone.querySelectorAll("h1, h2, h3, h4, h5, h6")
+              );
 
-    <figure>
-        <img src="images/high-level-functional-arch-2.png" alt="Module Overview of the Adaptive Cruise Control system" style="width:100%; max-width:600px; display:block; margin:40px auto;">
-        <figcaption style="text-align:center; font-style:italic;">Figure – Module Overview of the Adaptive Cruise Control system</figcaption>
-    </figure>
+              if (headings.length > 0) {
+                const minLevel = Math.min(
+                  ...headings.map(h => parseInt(h.tagName[1], 10))
+                );
 
-    <p>
-        Despite deciding that the overall architecture of the system is main program/subroutine with shared data, each of the components has its own unique architecture. Therefore, the system is really a hybrid architecture system rather than falling entirely into one architecture style. We will address the architecture of each of the modules in the modules section.
-    </p>
-    <h2>Module Overview</h2>
-    <p>
-        As illustrated through the high-level design, the combination of the individual modules creates a fully functioning software system for the Adaptive Cruise Control system. Each module is responsible for a distinct function, and together they form a cohesive, hybrid architecture that balances feedback control with modular separation of concerns.
-    </p>
+                const shift = minLevel - 1; // e.g., h2 → h1
 
-    <h2>High-Level Functional Overview</h2>
+                if (shift > 0) {
+                  headings.forEach(h => {
+                    const oldLevel = parseInt(h.tagName[1], 10);
+                    let newLevel = Math.max(1, oldLevel - shift);
 
-    <h3>Module 1 – Detection and Distance Control</h3>
-    <p>
-        The main goal of the detection and distance control module is to determine if there is a hazard that would cause the current speed of the cruise control to be unsafe. If a hazard exists, the cruise control will then be updated. In most situations, this would be a car ahead going slower than the current cruise control set speed, but it can also include hazards such as a car accident in the lane.
-    </p>
-    <p>
-        Therefore, the detection and tracking module needs to detect hazards, determine if a response needs to be taken, and then take that response if required. Based on these specifications, we decided that a feedback control loop would be the best architecture style for this module.
-    </p>
-    <p>
-        The system will need to take in the current cruise control settings and then use the detection information obtained through the sensors to determine if a speed adjustment needs to be made. Once this adjustment is made, there will be an output of the following distance, which the controller will then use to determine if additional updates need to be made.
-    </p>
+                    const newTag = document.createElement("h" + newLevel);
+                    newTag.innerHTML = h.innerHTML;
 
-    <figure>
-        <img src="images/detection-distance-control-design.jpg" alt="Detection and Distance Control Module Diagram" style="width:100%; max-width:600px; display:block; margin:40px auto;">
-        <figcaption style="text-align:center; font-style:italic;">Figure – Detection and Distance Control Module Based on Feedback Control Loop</figcaption>
-    </figure>
+                    // copy over attributes
+                    for (const attr of h.attributes) {
+                      newTag.setAttribute(attr.name, attr.value);
+                    }
 
-    <h3>Module 2 – Actuators</h3>
-    <p>
-        As shown by Shaw’s <em>Comparing Architectural Styles</em>, there are many choices for architectural style for the basic cruise control module. As a team, we decided to represent the cruise control module as Higgin’s feedback-control architecture. We specifically chose this architecture because of its use of external information (the environment) to adjust the speed.
-    </p>
-    <p>
-        This makes the most sense for our adaptive cruise control, as most of the changes we are making compared to the basic cruise control module have to do with how we are utilizing the external environment to make more informed and safer decisions (hazard detection). Therefore, this will allow for better integration with other modules in the overall system.
-    </p>
+                    h.replaceWith(newTag);
+                  });
+                }
+              }
+            }
 
-    <figure>
-        <img src="images/basic-cruise-control.jpg" alt="Basic Cruise Control Module Diagram" style="width:100%; max-width:600px; display:block; margin:40px auto;">
-        <figcaption style="text-align:center; font-style:italic;">Figure – Basic Cruise Control Module Based on Feedback-Control Architecture</figcaption>
-    </figure>
-
-    <h3>Module 3 – Fault Handling</h3>
-    <p>
-        This module is responsible for continuously monitoring the health and consistency of the Adaptive Cruise Control system’s inputs, commands, and actuators. It operates as an independent safety layer, designed to detect, classify, and respond to abnormal or unsafe conditions in real time. The fault monitor serves as the system’s “safety guardian,” ensuring that failures are detected early and that the system transitions gracefully into a safe state when necessary.
-    </p>
-    <p>
-        For the fault handling module, we decided to represent it using an event-driven architecture, as this style is best suited for systems that must respond dynamically to irregular or asynchronous inputs. We specifically chose this architecture because it allows the module to continuously listen for and process health and consistency events coming from multiple sources, such as sensors, vehicle feedback, and control commands. This approach enables the system to react immediately to faults, degraded performance, or unsafe operating conditions by issuing alerts, initiating safeing actions, or disabling control when necessary.
-    </p>
-    <p>
-        This makes the most sense for our adaptive cruise control system because the ability to detect and respond to faults in real time is essential for maintaining safety and reliability in automated vehicle operation. By using an event-driven design, the module can operate independently from the main control loop, ensuring that safety monitoring continues even if other processes are delayed or interrupted. Therefore, this allows for better coordination and integration with the supervisor, control, and driver interface modules while maintaining compliance with fail-silent and graceful degradation requirements. The fault handling module, based on event-driven architecture, is displayed below.
-    </p>
-
-    <figure>
-        <img src="images/fault-handling-arch.png" alt="Basic Cruise Control Module Diagram" style="width:100%; max-width:600px; display:block; margin:40px auto;">
-        <figcaption style="text-align:center; font-style:italic;">Fault Handling Module Based on Event-Driven Architecture</figcaption>
-    </figure>
-
-    <h3>Module 4 – Driver Interface</h3>
-    <p>
-        This module is responsible for managing all communication between the driver and the Adaptive Cruise Control (ACC) system. It acts as the central point through which the driver provides input to the system and receives feedback about its current operating state. The Driver Interface captures user actions such as ON, OFF, SET, CANCEL, RESUME, and GAP adjustments, and relays these commands to the Decision/Coordination Logic for interpretation. At the same time, it displays critical system information including the current mode (CRUISE, FOLLOW, HOLD, SUSPEND, or FAULT), the set speed, following distance, and any safety alerts or warnings. By ensuring that the driver remains informed and in control, this module plays an essential role in maintaining both safety and usability.
-    </p>
-    <p>
-        For the Driver Interface module, we decided to represent it using an event-driven architecture, as this style is best suited for systems that must handle asynchronous interactions and real-time user inputs. We specifically chose this architecture because it allows the module to process discrete events, such as button presses or pedal actions, and immediately transmit them to the Decision/Coordination Logic. Simultaneously, it listens for return events from other modules, such as status updates, warnings, or mode changes, and presents this information to the driver through the display interface. This continuous two-way communication between the driver and the system ensures that changes in the driving environment, driver intent, or system status are reflected in real time.
-    </p>
-    <p>
-        This makes the most sense for our adaptive cruise control system because the interface must provide rapid and reliable feedback to the driver to maintain trust and situational awareness. By using an event-driven design, the Driver Interface operates independently from the main control loop, ensuring that user inputs and alerts are never delayed by other processes. Therefore, this design allows for smooth coordination with the Decision/Coordination Logic, Fault Handling, and Longitudinal Control modules while maintaining compliance with human factors and usability requirements. The Driver Interface module, based on event-driven architecture, is displayed below.
-    </p>
-    <figure>
-        <img src="images/driver-interface-arch.png" alt="Detection and Distance Control Module Diagram" style="width:100%; max-width:600px; display:block; margin:40px auto;">
-        <figcaption style="text-align:center; font-style:italic;">Figure – Driver Interface Module Based on Event-Driven Architecture</figcaption>
-    </figure>
-        <table border="1" cellpadding="6" cellspacing="0">
-  <caption><strong>Module Directory</strong></caption>
-  <thead>
-    <tr>
-      <th>Module ID</th>
-      <th>Module Name</th>
-      <th>Architecture Style</th>
-      <th>Primary Responsibility</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>A1</td>
-      <td>Sensors &amp; Fusion / Detection &amp; Distance Control</td>
-      <td>Feedback-Control Loop</td>
-      <td>Detect lead targets &amp; hazards; compute safe following distance.</td>
-    </tr>
-    <tr>
-      <td>A2</td>
-      <td>Supervisor / Decision Manager</td>
-      <td>Process-Control / State Machine</td>
-      <td>Manage system modes (OFF, CRUISE, FOLLOW, etc.); interpret driver inputs.</td>
-    </tr>
-    <tr>
-      <td>A3</td>
-      <td>Longitudinal Control / Cruise Controller</td>
-      <td>Feedback-Control Loop</td>
-      <td>Convert intent to jerk-limited acceleration/deceleration commands.</td>
-    </tr>
-    <tr>
-      <td>A4</td>
-      <td>Actuation Interface / Actuators</td>
-      <td>Feedback-Control Loop</td>
-      <td>Send torque/brake commands to vehicle ECUs.</td>
-    </tr>
-    <tr>
-      <td>A5</td>
-      <td>Safety / Fault Monitor</td>
-      <td>Event-Driven</td>
-      <td>Detect faults; degrade gracefully; ensure fail-silent behavior.</td>
-    </tr>
-    <tr>
-      <td>A6</td>
-      <td>Driver Interface / HMI &amp; Input</td>
-      <td>Event-Driven</td>
-      <td>Handle user inputs and provide real-time feedback to the driver.</td>
-    </tr>
-  </tbody>
-</table>
-<br/>
-    <table border="1" cellpadding="6" cellspacing="0">
-  <caption><strong>Requirements &rarr; Architecture Traceability Matrix</strong></caption>
-  <thead>
-    <tr>
-      <th>Req ID</th>
-      <th>Requirement Summary</th>
-      <th>Mapped Module ID(s)</th>
-      <th>Architecture Style(s)</th>
-      <th>Notes / Rationale</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>FR-01</td>
-      <td>Maintain continuously-updated lead target (≥95% persistence).</td>
-      <td>A1</td>
-      <td>Feedback-Control Loop</td>
-      <td>Core perception &amp; tracking function.</td>
-    </tr>
-    <tr>
-      <td>FR-02</td>
-      <td>Update range/rate ≥20 Hz; latency ≤100 ms.</td>
-      <td>A1</td>
-      <td>Feedback-Control Loop</td>
-      <td>Sensor fusion timing in the feedback cycle.</td>
-    </tr>
-    <tr>
-      <td>FR-03</td>
-      <td>Driver selects time-headway setting.</td>
-      <td>A6, A2</td>
-      <td>Event-Driven; Process-Control</td>
-      <td>HMI captures input; supervisor applies setting.</td>
-    </tr>
-    <tr>
-      <td>FR-04</td>
-      <td>Maintain headway ±0.2 s to lead.</td>
-      <td>A1, A3, A4</td>
-      <td>Feedback-Control Loop</td>
-      <td>Perception → control → actuation loop.</td>
-    </tr>
-    <tr>
-      <td>FR-05</td>
-      <td>Deceleration comfort/safety limits.</td>
-      <td>A3, A4, A5</td>
-      <td>Feedback-Control; Event-Driven</td>
-      <td>Control enforces limits; faults trigger safing.</td>
-    </tr>
-    <tr>
-      <td>FR-06</td>
-      <td>Track set speed (no lead).</td>
-      <td>A3, A4</td>
-      <td>Feedback-Control Loop</td>
-      <td>Baseline cruise control behavior.</td>
-    </tr>
-    <tr>
-      <td>FR-07</td>
-      <td>Cut-in re-target ≤200 ms.</td>
-      <td>A1, A2</td>
-      <td>Feedback-Control; Event-Triggered</td>
-      <td>Rapid re-targeting on event.</td>
-    </tr>
-    <tr>
-      <td>FR-08</td>
-      <td>Lead cut-out → return to ACTIVE-CRUISE.</td>
-      <td>A2</td>
-      <td>Process-Control / State Machine</td>
-      <td>Mode transition logic.</td>
-    </tr>
-    <tr>
-      <td>FR-09</td>
-      <td>Stop-and-Go: stop and hold.</td>
-      <td>A1, A3, A4</td>
-      <td>Feedback-Control Loop</td>
-      <td>Closed-loop braking and holding.</td>
-    </tr>
-    <tr>
-      <td>FR-10</td>
-      <td>Auto-resume within N seconds.</td>
-      <td>A2, A6</td>
-      <td>Process-Control; Event-Driven</td>
-      <td>Supervisor resumes based on lead/driver event.</td>
-    </tr>
-    <tr>
-      <td>FR-11</td>
-      <td>Brake pedal suspends system.</td>
-      <td>A6, A2</td>
-      <td>Event-Driven</td>
-      <td>Immediate suspend on pedal event.</td>
-    </tr>
-    <tr>
-      <td>FR-12</td>
-      <td>Accelerator override bias.</td>
-      <td>A6, A2, A3</td>
-      <td>Event-Driven; Feedback-Control</td>
-      <td>Temporary speed increase while preserving distance where feasible.</td>
-    </tr>
-    <tr>
-      <td>FR-13</td>
-      <td>HMI displays speed, mode, gap, alerts.</td>
-      <td>A6</td>
-      <td>Event-Driven</td>
-      <td>Real-time driver feedback.</td>
-    </tr>
-    <tr>
-      <td>FR-14</td>
-      <td>Sensor blockage → graceful disengage.</td>
-      <td>A5, A2</td>
-      <td>Event-Driven</td>
-      <td>Fault triggers safe disengagement.</td>
-    </tr>
-    <tr>
-      <td>FR-15</td>
-      <td>Critical fault → zero torque/brake + alert.</td>
-      <td>A5, A4, A6</td>
-      <td>Event-Driven</td>
-      <td>Implements fail-silent behavior.</td>
-    </tr>
-    <tr>
-      <td>FR-16</td>
-      <td>Respect vehicle/jerk limits.</td>
-      <td>A4, A3</td>
-      <td>Feedback-Control Loop</td>
-      <td>Control bounded by dynamics constraints.</td>
-    </tr>
-    <tr>
-      <td>FR-17</td>
-      <td>Speed bounds (0 to market-legal max).</td>
-      <td>A2</td>
-      <td>Process-Control</td>
-      <td>Configuration and limit supervision.</td>
-    </tr>
-    <tr>
-      <td>NFR-S1</td>
-      <td>ISO 26262 process; ASIL allocation.</td>
-      <td>A5, A2</td>
-      <td>Event-Driven; Process-Control</td>
-      <td>Safety governance and allocation.</td>
-    </tr>
-    <tr>
-      <td>NFR-S2</td>
-      <td>Fail-silent on faults.</td>
-      <td>A5, A4</td>
-      <td>Event-Driven</td>
-      <td>No unintended propulsion/braking on faults.</td>
-    </tr>
-    <tr>
-      <td>NFR-P1–P3</td>
-      <td>Timing ≤100 ms; cycle ≤10 ms; RMS ≤0.75 m.</td>
-      <td>A1, A3, A4</td>
-      <td>Feedback-Control Loop</td>
-      <td>Real-time performance of the loop.</td>
-    </tr>
-    <tr>
-      <td>NFR-R1–R2</td>
-      <td>Reliability &amp; graceful degradation.</td>
-      <td>A5</td>
-      <td>Event-Driven</td>
-      <td>Redundancy-aware degradation.</td>
-    </tr>
-    <tr>
-      <td>NFR-U1–U2</td>
-      <td>States visible ≤2 s; button ack ≤150 ms.</td>
-      <td>A6</td>
-      <td>Event-Driven</td>
-      <td>Rapid HMI response/visibility.</td>
-    </tr>
-    <tr>
-      <td>NFR-C1–C2</td>
-      <td>Secure ECU commands &amp; diagnostics.</td>
-      <td>A2, A4</td>
-      <td>Process-Control; Secure Bus Interface</td>
-      <td>Authentication and secure sessions.</td>
-    </tr>
-    <tr>
-      <td>NFR-M1–M2</td>
-      <td>Logging &amp; DTCs with freeze frames.</td>
-      <td>A5, A2</td>
-      <td>Event-Driven</td>
-      <td>Monitoring and diagnostics data.</td>
-    </tr>
-  </tbody>
-</table>
-    <h2>Design Rationale</h2>
-
-    <h3>Introduction</h3>
-    <p>The design rationale for the ACC system explains the reasoning behind the architectural and modular decisions that support dynamic speed adjustment, distance monitoring, and driver safety. The team’s overarching objective was to design a modular and fault-tolerant system that integrates multiple subsystems including cruise control, detection, fault handling, and driver interface, into a cohesive software architecture. The rationale focuses on how design decisions fulfill both functional (FR) and non-functional requirements (NFR) including safety, reliability, modularity, and usability. The team’s proposed design is consistent with the principles from the process control systems read about in class as it emphasizes the separation of process concerns, such as vehicle motion, from control concerns, such as decision making based on sensor feedback.</p>
-
-    <p>The team’s rationale follows a few key software-architecture principles:</p>
-    <ul>
-        <li>Separation of process and control concerns (Garlan &amp; Shaw, 1993) to help manage complexity</li>
-        <li>Feedback-control design (Higgins in Shaw &amp; Garlan Case Studies) to maintain system stability</li>
-        <li>Quality-driven architecture (Pressman, 2010) to align implementation with safety, reliability, and maintainability goals.</li>
-    </ul>
-
-    <h3>Rationale for Architectural Style Selection</h3>
-    <p>After analyzing use cases and requirements, the team selected a Main Program and Subroutine style with Shared Data as the proposed system foundation. This decision was guided by the need for a central controller that could coordinate shared data between modules such as the detection subsystem, distance control, and fault handling. The shared-data model helps to ensure efficient communication between the different modules and supports the necessary real-time updates without having a large overhead for message passing.</p>
-
-    <p>However, the nature of the proposed system also required real-time feedback loops which are intrinsic in feedback-control architectures as referenced in Garlan and Shaw’s comparison of architectural styles. Therefore, the team’s ACC design adopts a hybrid architecture by combining centralized coordination with localized feedback loops for real-time responsiveness. This approach allows the team to balance modularity and performance where the individual modules handle all environmental sensing and decision logic, while the main program maintains and ensures consistent coordination. Finally, this architectural style choice meets several functional and non-functional requirements:</p>
-
-    <ul>
-        <li>FR-01 and FR-02 by enabling high frequency sensor fusion and propagation of range/range-rate data to control modules.</li>
-        <li>NFR-P1 and NFR-p2 through bounded end-to-end latency and deterministic control cycle scheduling.</li>
-        <li>NFR-S1 and NFR-S2 by providing predictable fault handling paths in which the main supervisor enforces fail-silent behavior.</li>
-        <li>NFR-M1 and NFR-M2 by encapsulating each module separately with well-defined and well-designed interfaces allowing easier debugging and logging efforts.</li>
-    </ul>
-
-    <p>The team evaluated alternative architectures before choosing the hybrid approach. A layered architecture was considered as it offered good separation of abstraction, but it also introduces latency which was deemed unsuitable for safety reasons. The team also considered an event-driven system because it would increase flexibility within the system; however, it overall complicates the synchronization across the continuous feedback loops, making it a poor choice. Therefore, the hybrid design was chosen as the best fit for the project to meet the system’s real-time needs and safety requirements.</p>
-
-    <h3>Module-Level Design Decisions and Rationale</h3>
-
-    <h4>Basic Cruise Control Module</h4>
-    <p>The Basic Cruise Control Module was modeled as a feedback-control architecture to continuously monitor and adjust vehicle speed relative to a driver-set target. This aligns with Higgins’ model of feedback control where the system compares actual speed against the reference and compensates accordingly. The feedback loop allows the team’s system to respond effectively and efficiently to gradients and external disturbances while still maintaining the driver-set target speed.</p>
-
-    <p>This decision allows the team to satisfy all the key functional requirements of this module, outlined on Page 3, including FR-16 and FR-17, and it brings added reliability and accuracy to the system. The trade-off of this decision is that there is added computational overhead because of the continuous monitoring, but the team determined that this cost is worth taking on because the feedback control architecture provides measurable improvements in performance consistency as well as driver comfort.</p>
-
-    <h4>Detection &amp; Distance Control Module</h4>
-    <p>The Detection and Distance Control Module is central to the adaptive aspect of the system. The team decided to implement this module using a sensor-driven feedback control loop, which combines the radar and environmental data to determine a safe following distance. The feedback structure of this module, as shown in the Detection and Distance Control Module Based on Feedback Control Loop Figure, enables real-time adjustments as the lead vehicle accelerates, decelerates, or exits the lane.</p>
-
-    <p>This design choice directly addresses each of the functional requirements for this module, directly fulfilling FR-01, FR-02, FR-03, FR-04, and FR05, and goes further to ensure added safety, responsiveness, and precision. The system’s use of continuously updated range-rate data supports the necessary adaptive behavior that is consistent with the process-control design patterns previously touched on. Although the team did consider a rule-based decision system, this chosen design was a better fit because it offers smoother control transitions and allows the architecture to evolve as sensors continue to evolve too, compared to the rule-based design which would limit responsiveness as well as scalability.</p>
-
-    <h4>Fault Handling Module</h4>
-    <p>For fault handling, the team adopted a fault tolerant monitoring and exception handling subsystem that can integrate with the existing shared-data architecture. The module monitors sensor integrity, actuator feedback, and overall network health. This monitoring system allows the system to detect when performance issues arise, and it can trigger alerts and safely disengage the ACC.</p>
-
-    <p>This design meets all the functional requirements listed on Page 3 for the Fault Handling Module, directly fulfilling FR-14, FR-15, and ensuring compliance with NFR-S1 and NFR-S2. Additionally, the design adds dependability and safety to the overall system. The team chose this design because it offers a proactive monitoring mechanism as opposed to a passive error reporting system, because the proactive monitoring allows timely intervention to improve the safety of the system. Although this module design does add diagnostic complexity, it is worth eating this cost because of the added risk reduction.</p>
-
-    <h4>Driver Interface Module</h4>
-    <p>The Driver Interface Module was designed with human factors in mind, focusing on clarity and minimal cognitive load for the drivers. The team chose to use a status-drive interaction design for this module to show the ACC states, such as active, standby, and error, in a format that would be intuitive and easy to understand for humans. The module supports user inputs as well, so the driver can make speed and distance adjustments and receive transparent information about the system’s behavior to stay informed.</p>
-
-    <p>This design addresses all the functional requirements listed on Page 3 for the Driver Interface Module, directly fulfilling FR-03, FR-11, FR-12, and FR-13, and usability metrics NFR-U1 and NFR-U2. Additionally, the design adds additional quality attributes like usability, understandability, and safety to the system. The team chose this design because it ensures simplicity over feature density, preventing featuritis, limiting driver distraction, and reducing complexity and overhead. This aligns well with Pressman’s emphasis on designing human factors and maintainability with software quality framework which fed into the team’s decision as well.</p>
-
-    <h3>Key Quality Attributes and Trade-offs</h3>
-    <p>The ACC architecture was designed to satisfy multiple quality attributes while balancing several competing priorities:</p>
-    <ul>
-        <li><strong>Safety &amp; Reliability:</strong> The redundant sensing and feedback loops in the team’s system guarantee system responsiveness under ever changing, dynamic, and unpredictable road conditions. This supports FR-05, FR-14, FR-15, NFR-S1, NFR-S2, NFR-R1, and NFR-R2. The tradeoff of these attributes is that they require additional CPU overhead for safety tasks.</li>
-        <li><strong>Modularity &amp; Maintainability:</strong> The hybrid architectural structure allows individual modules to be updated without the team having to redesign the entire system. This supports NFR-M1 and NFR-M2. The tradeoff of these attributes is that they bring about additional logging storage.</li>
-        <li><strong>Performance, Efficiency, and Timing:</strong> The continuous data processing required by this system is very computationally heavy and intensive, but the team’s modular optimization approach helps to minimize latency. This supports FR-02, FR-07, FR-10, NFR-P1, NFR-P2, and NFR-P3. The tradeoff of these attributes is that they require tight scheduling complexity.</li>
-        <li><strong>Usability:</strong> The clear driver feedback and fault alerts improve the trust and control of both the system and the driver. This supports FR-03, FR-13, NFR-U1, and NFR-U2. The tradeoff of this attribute is that it reduces display customization on the drive interface, but the simplicity is worth it.</li>
-        <li><strong>Scalability:</strong> The shared-data approach supports flexibility for future extensions and enhancements, such as staying in the lane feature or avoiding collisions feature. This supports FR-01, FR-02, and NFR-M1. The tradeoff of this attribute is that it does introduce some complexity for future sensor integration efforts.</li>
-    </ul>
-
-    <p>The trade-offs in the system that the team had to take on primarily include balancing computational complexity with safety and responsiveness, but given the nature of the ACC system, the team decided that safety and responsiveness are of the utmost importance. The chosen architecture favors reliability and safety over raw performance, which is also consistent with real-world automotive system priorities based on past readings and case studies.</p>
-
-    <h3>Alternative Design Considerations</h3>
-    <p>The team did consider alternative architectures, such as fully event-driven or layered systems, but ultimately decided that these choices brought about too many synchronization and timing constraints. The team also considered a client-server design because it could separate sensor data acquisition from control logic, but it would introduce too much latency and single point of failure risks, thus reducing the overall safety of the system. The current hybrid structure that the team chose provides a practical compromise and trade-off decision that preserves responsiveness and safety while maintaining extensibility and scalability in the future.</p>
-
-    <h3>Conclusion of Design Rationale</h3>
-    <p>The design decisions documented here collectively reflect the team’s goal of delivering a robust, modular fault tolerant ACC system. The hybrid architecture ensures real-time responsiveness, while individual module designs enhance safety (NFR-S1-S2), usability (NFR-U1-U2), and maintainability (NFR-M1-M2) objectives while delivering on all functional behaviors (FR-01-FR-17) such as dynamic gap control, speed maintenance, fault detection, and driver transparency. Every major design decision that the team decided on was to align with these functional and non-functional requirements and follows the process-control principles by following a clear separation of concerns and feedback-driven adaptability within the system.</p>
-    <h2>Conclusion</h2>
-
-    <p>The ACC system demonstrates how process-control principles and quality-driven software architecture can yield a robust, human-centered automotive design. By combining a human-centered design with the rigorous architectural reasoning and rationale, the team was able to achieve a resulting system that balances innovation, reliability, as well as practicality. Beginning from the adaptive cruise control case study, the team was able to extend it to a dynamic, sensory-based control using a modular hybrid architecture mapped directly to the FR and NFRs. The overall system design offers high-quality software that is consistent with software quality and design attributes and goals</p>
-
+            document.getElementById(elementId).innerHTML = clone.innerHTML;
+          });
+      });
+    </script>
 </div>
 </body>
 
